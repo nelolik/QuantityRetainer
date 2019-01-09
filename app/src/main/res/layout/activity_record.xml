@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RecordActivity">
+
+    <TextView
+        android:id="@+id/total_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Total count:"
+        style="@style/RecordText"/>
+
+    <TextView
+        android:id="@+id/total_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@+id/total_text"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="111111"
+        style="@style/RecordText"/>
+
+    <EditText
+        android:id="@+id/add_count_input"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/total_text"
+        style="@style/RecordText"
+        tools:text="500"/>
+
+    <Button
+        android:id="@+id/btn_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@id/add_count_input"
+        app:layout_constraintTop_toBottomOf="@id/total_text"
+        style="@style/RecordText"
+        tools:text="ADD"/>
+
+    <view class="android.support.v7.app.AlertController$RecycleListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/add_count_input"
+        app:layout_constraintRight_toRightOf="parent">
+
+    </view>
+
+</android.support.constraint.ConstraintLayout>
