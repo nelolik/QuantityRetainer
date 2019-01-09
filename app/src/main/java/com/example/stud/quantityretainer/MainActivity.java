@@ -11,7 +11,8 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements
+        MainRecyclerAdapter.ListItemClickListener {
 
 
     @Override
@@ -24,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView mTopicsRecyclerView;
         mTopicsRecyclerView = findViewById(R.id.topics_recycler_view);
 
-        MainRecyclerAdapter mainRecyclerAdapter = new MainRecyclerAdapter(this);
+        MainRecyclerAdapter mainRecyclerAdapter = new MainRecyclerAdapter(this, this);
         mTopicsRecyclerView.setAdapter(mainRecyclerAdapter);
         mTopicsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -58,5 +59,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onListItemClick(int clickedItemIndex) {
+
     }
 }

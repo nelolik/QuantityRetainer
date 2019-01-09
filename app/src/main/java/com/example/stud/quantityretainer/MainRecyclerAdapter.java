@@ -8,15 +8,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.stud.quantityretainer.Utilyties.RecordsProvider;
+
 public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapter.TopicViewHolder> {
-    static String topics[] = {"one", "two", "three", "fore", "five", "six", "seven", "eight", "nine",
-            "one", "two", "three", "fore", "five", "six", "seven", "eight", "nine",
-            "one", "two", "three", "fore", "five", "six", "seven", "eight", "nine"};
+//    static String topics[] = {"one", "two", "three", "fore", "five", "six", "seven", "eight", "nine",
+//            "one", "two", "three", "fore", "five", "six", "seven", "eight", "nine",
+//            "one", "two", "three", "fore", "five", "six", "seven", "eight", "nine"};
 
     Context mContext;
 
-    public MainRecyclerAdapter(Context context) {
+    private RecordsProvider recordsProvider;
+    final private ListItemClickListener mItemClickListener;
+
+    public MainRecyclerAdapter(Context context, ListItemClickListener listener) {
+
         mContext = context;
+        recordsProvider = new RecordsProvider();
+        mItemClickListener = listener;
     }
 
     @NonNull
@@ -29,27 +37,39 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
 
     @Override
     public void onBindViewHolder(@NonNull TopicViewHolder holder, int position) {
-        if (position < 0 || position >= topics.length) {
+        if (position < 0 || position >= recordsProvider.getRecordsCount()) {
             return;
         }
 
-        holder.mTopicTextView.setText(topics[position]);
+        holder.mTopicTextView.setText(recordsProvider.getRecord(position));
     }
 
 
     @Override
     public int getItemCount() {
-        return topics.length;
+        return recordsProvider.getRecordsCount();
     }
 
 
-    public class TopicViewHolder extends RecyclerView.ViewHolder {
+    public class TopicViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView mTopicTextView;
 
         public TopicViewHolder(View itemView) {
             super(itemView);
             mTopicTextView = itemView.findViewById(R.id.topic_tv);
+
+            itemView.setOnClickListener(this);
         }
+
+
+        @Override
+        public void onClick(View v) {
+            mItemClickListener.onListItemClick(getAdapterPosition());
+        }
+    }
+
+    public interface ListItemClickListener {
+        public void onListItemClick(int clickedItemIndex);
     }
 }
