@@ -1,6 +1,7 @@
 package com.example.stud.quantityretainer;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,22 +10,22 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.stud.quantityretainer.Utilyties.RecordsProvider;
+import com.example.stud.quantityretainer.Utilyties.RetainDBContract;
 
 public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapter.TopicViewHolder> {
-//    static String topics[] = {"one", "two", "three", "fore", "five", "six", "seven", "eight", "nine",
-//            "one", "two", "three", "fore", "five", "six", "seven", "eight", "nine",
-//            "one", "two", "three", "fore", "five", "six", "seven", "eight", "nine"};
 
-    Context mContext;
+    private Context mContext;
+    private Cursor mCursor;
 
     private RecordsProvider recordsProvider;
     final private ListItemClickListener mItemClickListener;
 
-    public MainRecyclerAdapter(Context context, ListItemClickListener listener) {
+    public MainRecyclerAdapter(Context context, ListItemClickListener listener, Cursor cursor) {
 
         mContext = context;
         recordsProvider = new RecordsProvider();
         mItemClickListener = listener;
+        mCursor = cursor;
     }
 
     @NonNull
@@ -37,17 +38,18 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
 
     @Override
     public void onBindViewHolder(@NonNull TopicViewHolder holder, int position) {
-        if (position < 0 || position >= recordsProvider.getRecordsCount()) {
+        if (!mCursor.moveToPosition(position) || mCursor == null) {
             return;
         }
-
-        holder.mTopicTextView.setText(recordsProvider.getRecord(position));
+        int columnIndex = mCursor.getColumnIndex(RetainDBContract.Retentions.COLUMN_RETENTION_NAME);
+        String retentionName = mCursor.getString(columnIndex);
+        holder.mTopicTextView.setText(retentionName);
     }
 
 
     @Override
     public int getItemCount() {
-        return recordsProvider.getRecordsCount();
+        return mCursor.getCount();
     }
 
 

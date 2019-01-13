@@ -1,6 +1,8 @@
 package com.example.stud.quantityretainer;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -8,15 +10,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.example.stud.quantityretainer.Utilyties.RecordsProvider;
+import com.example.stud.quantityretainer.Utilyties.RetainDBContract;
+import com.example.stud.quantityretainer.Utilyties.RetentionsNamesDBHelper;
 
 public class MainActivity extends AppCompatActivity implements
         MainRecyclerAdapter.ListItemClickListener {
 
+    private SQLiteDatabase mDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,9 +33,20 @@ public class MainActivity extends AppCompatActivity implements
         RecyclerView mTopicsRecyclerView;
         mTopicsRecyclerView = findViewById(R.id.topics_recycler_view);
 
-        MainRecyclerAdapter mainRecyclerAdapter = new MainRecyclerAdapter(this, this);
-        mTopicsRecyclerView.setAdapter(mainRecyclerAdapter);
         mTopicsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        RetentionsNamesDBHelper dbHelper = new RetentionsNamesDBHelper(this);
+        mDb = dbHelper.getWritableDatabase();
+        Cursor cursor = getAllRetentions();
+        if (cursor.getCount() == 0) {
+            RecordsProvider.writeFakeRetentionsNames(mDb);
+        }
+        MainRecyclerAdapter mainRecyclerAdapter = new MainRecyclerAdapter(this,
+                this,
+                cursor);
+
+
+        mTopicsRecyclerView.setAdapter(mainRecyclerAdapter);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -70,5 +86,15 @@ public class MainActivity extends AppCompatActivity implements
         Intent intent = new Intent(this, RecordActivity.class);
         intent.putExtra(RecordActivity.TEXT_TAG, provider.getRecord(clickedItemIndex));
         startActivity(intent);
+    }
+
+    private Cursor getAllRetentions() {
+        return mDb.query(RetainDBContract.Retentions.TABLE_NAME,
+                null,
+                null,
+                null,
+                null,
+                null,
+                RetainDBContract.Retentions._ID);
     }
 }
