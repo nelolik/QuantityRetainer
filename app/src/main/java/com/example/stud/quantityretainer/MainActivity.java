@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,7 +21,8 @@ import com.example.stud.quantityretainer.Utilyties.RetainDBContract;
 import com.example.stud.quantityretainer.Utilyties.RetentionsNamesDBHelper;
 
 public class MainActivity extends AppCompatActivity implements
-        MainRecyclerAdapter.ListItemClickListener {
+        MainRecyclerAdapter.ListItemClickListener,
+        AddRetentionDialog.AddRetentionOnCLick {
 
     private SQLiteDatabase mDb;
 
@@ -52,8 +55,10 @@ public class MainActivity extends AppCompatActivity implements
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                AddRetentionDialog dialog = new AddRetentionDialog();
+                dialog.setAddRetentionOnCLick(MainActivity.this);
+                dialog.show(fragmentManager, "retentions");
             }
         });
     }
@@ -96,5 +101,24 @@ public class MainActivity extends AppCompatActivity implements
                 null,
                 null,
                 RetainDBContract.Retentions._ID);
+    }
+
+    @Override
+    public void onDialogClickAdd(DialogFragment dialogFragment) {
+        Snackbar.make(findViewById(R.id.fab), "Button add pushed", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
+        AddRetentionDialog dialog = (AddRetentionDialog) dialogFragment;
+        String newName = dialog.getNewRetentionName();
+        addRetentionToDB(newName);
+    }
+
+    @Override
+    public void onDialogClickCancel(DialogFragment dialogFragment) {
+        Snackbar.make(findViewById(R.id.fab), "Button cancel pushed", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
+    }
+
+    private void addRetentionToDB(String name) {
+
     }
 }
