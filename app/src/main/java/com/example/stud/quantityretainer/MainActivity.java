@@ -1,5 +1,6 @@
 package com.example.stud.quantityretainer;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements
         AddRetentionDialog.AddRetentionOnCLick {
 
     private SQLiteDatabase mDb;
+    private RecyclerView mTopicsRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        RecyclerView mTopicsRecyclerView;
+
         mTopicsRecyclerView = findViewById(R.id.topics_recycler_view);
 
         mTopicsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -119,6 +121,31 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void addRetentionToDB(String name) {
+        if (name == null || name.isEmpty()) {
+            return;
+        }
 
+        try {
+            mDb.beginTransaction();
+            ContentValues cv = new ContentValues();
+            cv.put(RetainDBContract.Retentions.COLUMN_RETENTION_NAME, name);
+            long id = mDb.insert(RetainDBContract.Retentions.TABLE_NAME, null, cv);
+            if (id != -1) {
+                String tableName = "table" + id;
+                cv.put(RetainDBContract.Retentions._ID, id);
+                cv.put(RetainDBContract.Retentions.COLUMN_TABLE_NAME, tableName);
+                mDb.replaceOrThrow(RetainDBContract.Retentions.TABLE_NAME, null, cv);
+                mDb.setTransactionSuccessful();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        } finally {
+            mDb.endTransaction();
+        }
+
+        Cursor cursor = getAllRetentions();
+        MainRecyclerAdapter adapter = new MainRecyclerAdapter(this, this, cursor);
+        mTopicsRecyclerView.setAdapter(adapter);
     }
 }
