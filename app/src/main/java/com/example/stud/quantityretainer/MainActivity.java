@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.example.stud.quantityretainer.Utilyties.RecordsProvider;
 import com.example.stud.quantityretainer.Utilyties.RetainDBContract;
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private SQLiteDatabase mDb;
     private RecyclerView mTopicsRecyclerView;
+    private ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,13 +38,14 @@ public class MainActivity extends AppCompatActivity implements
         setSupportActionBar(toolbar);
 
 
+        mProgressBar = findViewById(R.id.main_progress_bar);
         mTopicsRecyclerView = findViewById(R.id.topics_recycler_view);
 
         mTopicsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         RetentionsNamesDBHelper dbHelper = new RetentionsNamesDBHelper(this);
         mDb = dbHelper.getWritableDatabase();
-        Cursor cursor = getAllRetentions();
+        Cursor cursor =getAllRetentions();
         if (cursor.getCount() == 0) {
             RecordsProvider.writeFakeRetentionsNames(mDb);
         }
@@ -88,10 +91,10 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onListItemClick(int clickedItemIndex) {
-        RecordsProvider provider = new RecordsProvider();
+    public void onListItemClick(String retentionName, String tableName) {
         Intent intent = new Intent(this, RecordActivity.class);
-        intent.putExtra(RecordActivity.TEXT_TAG, provider.getRecord(clickedItemIndex));
+        intent.putExtra(RecordActivity.TAG_NAME, retentionName);
+        intent.putExtra(RecordActivity.TAG_TABLE, tableName);
         startActivity(intent);
     }
 
@@ -148,4 +151,5 @@ public class MainActivity extends AppCompatActivity implements
         MainRecyclerAdapter adapter = new MainRecyclerAdapter(this, this, cursor);
         mTopicsRecyclerView.setAdapter(adapter);
     }
+
 }

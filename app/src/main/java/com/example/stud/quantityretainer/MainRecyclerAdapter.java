@@ -44,6 +44,8 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
         int columnIndex = mCursor.getColumnIndex(RetainDBContract.Retentions.COLUMN_RETENTION_NAME);
         String retentionName = mCursor.getString(columnIndex);
         holder.mTopicTextView.setText(retentionName);
+        columnIndex = mCursor.getColumnIndex(RetainDBContract.Retentions.COLUMN_TABLE_NAME);
+        holder.mTableName = mCursor.getString(columnIndex);
     }
 
 
@@ -56,6 +58,7 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
     public class TopicViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView mTopicTextView;
+        String mTableName;
 
         public TopicViewHolder(View itemView) {
             super(itemView);
@@ -67,11 +70,11 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
 
         @Override
         public void onClick(View v) {
-            mItemClickListener.onListItemClick(getAdapterPosition());
+            mItemClickListener.onListItemClick(mTopicTextView.getText().toString(), mTableName);
         }
     }
 
     public interface ListItemClickListener {
-        public void onListItemClick(int clickedItemIndex);
+        public void onListItemClick(String retentionName, String tableName);
     }
 }
