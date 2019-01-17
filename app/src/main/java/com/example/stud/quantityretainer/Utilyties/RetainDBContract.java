@@ -6,14 +6,17 @@ public class RetainDBContract {
     private RetainDBContract() {}
 
     public static class RetainEntity implements BaseColumns {
+        public static final String TABLE_NAME = "entities";
+        public static final String COLUMN_NAME = "name";
         public static final String COLUMN_COUNT = "count";
         public static final String COLUMN_DATE = "date";
-        public static final String SQL_CREATE_PREFIX = "CREATE TABLE ";
-        public static final String SQL_CREATE_SUFFIX = " (" + _ID + " INTEGER PRIMARY KEY, " +
+        public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME +
+                " (" + _ID + " INTEGER PRIMARY KEY, " +
+                COLUMN_NAME + " TEXT NOT NULL, " +
                 COLUMN_COUNT + " INTEGER NOT NULL, " +
                 COLUMN_DATE + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
-        private static final String SQL_DELETE_ENTRIES_PREFIX =
-                "DROP TABLE IF EXISTS ";
+        private static final String SQL_DELETE_ENTRIES =
+                "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
 
     public static class Retentions implements BaseColumns {

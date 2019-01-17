@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements
 
         RetentionsNamesDBHelper dbHelper = new RetentionsNamesDBHelper(this);
         mDb = dbHelper.getWritableDatabase();
-        Cursor cursor =getAllRetentions();
+        Cursor cursor = getAllRetentions();
         if (cursor.getCount() == 0) {
             RecordsProvider.writeFakeRetentionsNames(mDb);
         }
@@ -99,13 +99,18 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private Cursor getAllRetentions() {
-        return mDb.query(RetainDBContract.Retentions.TABLE_NAME,
-                null,
-                null,
-                null,
-                null,
-                null,
-                RetainDBContract.Retentions._ID);
+        try {
+            return mDb.query(RetainDBContract.Retentions.TABLE_NAME,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    RetainDBContract.Retentions._ID);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
