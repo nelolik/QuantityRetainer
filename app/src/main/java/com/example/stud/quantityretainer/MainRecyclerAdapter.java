@@ -55,7 +55,9 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
     }
 
 
-    public class TopicViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class TopicViewHolder extends RecyclerView.ViewHolder implements
+            View.OnClickListener,
+            View.OnLongClickListener {
 
         TextView mTopicTextView;
         String mTableName;
@@ -65,6 +67,7 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
             mTopicTextView = itemView.findViewById(R.id.topic_tv);
 
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
 
@@ -72,9 +75,15 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
         public void onClick(View v) {
             mItemClickListener.onListItemClick(mTopicTextView.getText().toString(), mTableName);
         }
+
+        @Override
+        public boolean onLongClick(View v) {
+            return mItemClickListener.onLongListItemClick(this.mTopicTextView, mTableName);
+        }
     }
 
     public interface ListItemClickListener {
         public void onListItemClick(String retentionName, String tableName);
+        public boolean onLongListItemClick(TextView view, String tableName);
     }
 }

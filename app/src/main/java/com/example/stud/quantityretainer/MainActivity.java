@@ -3,10 +3,10 @@ package com.example.stud.quantityretainer;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -16,9 +16,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import com.example.stud.quantityretainer.Utilyties.RecordsProvider;
 import com.example.stud.quantityretainer.Utilyties.RetainDBContract;
 import com.example.stud.quantityretainer.Utilyties.RetentionsNamesDBHelper;
 
@@ -46,9 +48,9 @@ public class MainActivity extends AppCompatActivity implements
         RetentionsNamesDBHelper dbHelper = new RetentionsNamesDBHelper(this);
         mDb = dbHelper.getWritableDatabase();
         Cursor cursor = getAllRetentions();
-        if (cursor.getCount() == 0) {
-            RecordsProvider.writeFakeRetentionsNames(mDb);
-        }
+//        if (cursor.getCount() == 0) {
+//            RecordsProvider.writeFakeRetentionsNames(mDb);
+//        }
         MainRecyclerAdapter mainRecyclerAdapter = new MainRecyclerAdapter(this,
                 this,
                 cursor);
@@ -98,6 +100,31 @@ public class MainActivity extends AppCompatActivity implements
         startActivity(intent);
     }
 
+    @Override
+    public boolean onLongListItemClick(final TextView view, final String tableName) {
+        PopupMenu popupMenu = new PopupMenu(this, view);
+        popupMenu.inflate(R.menu.main_list_item_menu);
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.menu_rename:
+                        renameRetention(view, tableName);
+                        break;
+                    case R.id.menu_delete:
+                        Toast.makeText(getApplicationContext(),
+                                "Menu delete clicked", Toast.LENGTH_LONG)
+                                .show();
+                        break;
+                }
+
+                return false;
+            }
+        });
+        popupMenu.show();
+        return true;
+    }
+
     private Cursor getAllRetentions() {
         try {
             return mDb.query(RetainDBContract.Retentions.TABLE_NAME,
@@ -115,8 +142,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onDialogClickAdd(DialogFragment dialogFragment) {
-        Snackbar.make(findViewById(R.id.fab), "Button add pushed", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show();
         AddRetentionDialog dialog = (AddRetentionDialog) dialogFragment;
         String newName = dialog.getNewRetentionName();
         addRetentionToDB(newName);
@@ -124,8 +149,8 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onDialogClickCancel(DialogFragment dialogFragment) {
-        Snackbar.make(findViewById(R.id.fab), "Button cancel pushed", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show();
+//        Snackbar.make(findViewById(R.id.fab), "Button cancel pushed", Snackbar.LENGTH_LONG)
+//                .setAction("Action", null).show();
     }
 
     private void addRetentionToDB(String name) {
@@ -155,6 +180,66 @@ public class MainActivity extends AppCompatActivity implements
         Cursor cursor = getAllRetentions();
         MainRecyclerAdapter adapter = new MainRecyclerAdapter(this, this, cursor);
         mTopicsRecyclerView.setAdapter(adapter);
+    }
+
+    private void renameRetention(TextView view, final String tableName) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        RenameRetentionDialog dialog = new RenameRetentionDialog();
+        dialog.setOnClickListener(new RenameRetentionDialog.RenameRetentionONClickListener() {
+            @Override
+            public void onDialogClickRename(String newName) {
+                writeNewRetentionNameToDB(newName, tableName);
+            }
+        });
+        dialog.show(fragmentManager, "rename");
+    }
+
+    void writeNewRetentionNameToDB(String newName, String tableName) {
+        Cursor cursor = null;
+        try {
+            cursor = mDb.query(RetainDBContract.Retentions.TABLE_NAME,
+                    null,
+                    RetainDBContract.Retentions.COLUMN_TABLE_NAME + "=?",
+                    new String[] {tableName},
+                    null,
+                    null,
+                    RetainDBContract.Retentions._ID);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+
+        if (cursor.moveToFirst()) {
+            int columnIDIndex = cursor.getColumnIndex(RetainDBContract.Retentions._ID);
+            long ID = cursor.getLong(columnIDIndex);
+            long retId = 0;
+            ContentValues cv = new ContentValues();
+            cv.put(RetainDBContract.Retentions._ID, ID);
+            cv.put(RetainDBContract.Retentions.COLUMN_TABLE_NAME, tableName);
+            cv.put(RetainDBContract.Retentions.COLUMN_RETENTION_NAME, newName);
+            try {
+                mDb.beginTransaction();
+                retId = mDb.replaceOrThrow(RetainDBContract.Retentions.TABLE_NAME,
+                        null,
+                        cv);
+                mDb.setTransactionSuccessful();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                mDb.endTransaction();
+            }
+
+            if (ID == retId) {
+                Toast.makeText(getApplicationContext(), "Sucsess" + cursor.getCount(),
+                        Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "New record" + cursor.getCount(),
+                        Toast.LENGTH_LONG).show();
+            }
+            cursor = getAllRetentions();
+            MainRecyclerAdapter adapter = new MainRecyclerAdapter(this, this, cursor);
+            mTopicsRecyclerView.setAdapter(adapter);
+        }
     }
 
 }

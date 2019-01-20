@@ -1,4 +1,6 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="topic_vh_name">48dp</dimen>
+    <dimen name="count_in_width">96dp</dimen>
+    <dimen name="padding_divider">8dp</dimen>
 </resources>

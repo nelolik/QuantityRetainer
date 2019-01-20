@@ -4,4 +4,8 @@
     <string name="add">Add</string>
     <string name="cancel">Cancel</string>
     <string name="add_retention_name">Retention name</string>
+    <string name="total_count">Total count:</string>
+    <string name="rename">Rename</string>
+    <string name="delete">Delete</string>
+    <string name="enter_new_name">Enter new name</string>
 </resources>
