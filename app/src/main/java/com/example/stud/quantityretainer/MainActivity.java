@@ -7,6 +7,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -19,9 +20,12 @@ import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.example.stud.quantityretainer.Dialogs.AddRetentionDialog;
+import com.example.stud.quantityretainer.Dialogs.DeleteConfirmationDialog;
+import com.example.stud.quantityretainer.Dialogs.RenameRetentionDialog;
 import com.example.stud.quantityretainer.Utilyties.RetainDBContract;
+import com.example.stud.quantityretainer.Utilyties.RetainDBHelper;
 import com.example.stud.quantityretainer.Utilyties.RetentionsNamesDBHelper;
 
 public class MainActivity extends AppCompatActivity implements
@@ -78,6 +82,15 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.show_all_retentions) {
+            Snackbar.make(findViewById(R.id.fab), "Show all retentions", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
+        }
+        return super.onContextItemSelected(item);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -112,9 +125,7 @@ public class MainActivity extends AppCompatActivity implements
                         renameRetention(view, tableName);
                         break;
                     case R.id.menu_delete:
-                        Toast.makeText(getApplicationContext(),
-                                "Menu delete clicked", Toast.LENGTH_LONG)
-                                .show();
+                        deleteRetention(tableName);
                         break;
                 }
 
@@ -228,18 +239,52 @@ public class MainActivity extends AppCompatActivity implements
             } finally {
                 mDb.endTransaction();
             }
-
-            if (ID == retId) {
-                Toast.makeText(getApplicationContext(), "Sucsess" + cursor.getCount(),
-                        Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(getApplicationContext(), "New record" + cursor.getCount(),
-                        Toast.LENGTH_LONG).show();
-            }
             cursor = getAllRetentions();
             MainRecyclerAdapter adapter = new MainRecyclerAdapter(this, this, cursor);
             mTopicsRecyclerView.setAdapter(adapter);
         }
+    }
+
+    void deleteRetention(final String tableName) {
+        FragmentManager manager = getSupportFragmentManager();
+        DeleteConfirmationDialog dialog = new DeleteConfirmationDialog();
+        dialog.setOnDeleteClickListener(new DeleteConfirmationDialog.RenameRetentionONClickListener() {
+            @Override
+            public void onDialogClickDelete() {
+
+            }
+        });
+        dialog.show(manager, "deleteDialog");
+    }
+
+    void deleteRetentionFromDB(String tableName) {
+        try {
+            mDb.beginTransaction();
+            mDb.delete(RetainDBContract.Retentions.TABLE_NAME,
+                    RetainDBContract.Retentions.TABLE_NAME + "=?",
+                    new String[] {tableName});
+            mDb.endTransaction();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            mDb.setTransactionSuccessful();
+        }
+        SQLiteDatabase retentionsDb = null;
+        try {
+            retentionsDb = new RetainDBHelper(this,
+                    RetainDBContract.RetainEntity.TABLE_NAME).getWritableDatabase();
+            retentionsDb.beginTransaction();
+            retentionsDb.delete(RetainDBContract.RetainEntity.TABLE_NAME,
+                    RetainDBContract.RetainEntity.TABLE_NAME + "=?",
+                    new String[] {tableName});
+            retentionsDb.endTransaction();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            retentionsDb.setTransactionSuccessful();
+            retentionsDb.close();
+        }
+
     }
 
 }

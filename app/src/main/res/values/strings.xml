@@ -8,4 +8,5 @@
     <string name="rename">Rename</string>
     <string name="delete">Delete</string>
     <string name="enter_new_name">Enter new name</string>
+    <string name="confirm_delete">Delete selected element?</string>
 </resources>
