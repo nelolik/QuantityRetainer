@@ -12,5 +12,6 @@
         android:id="@+id/show_all_retentions"
         android:orderInCategory="100"
         android:title="Show all retentions"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        android:onClick="onMenuShowAllRetentions"/>
 </menu>

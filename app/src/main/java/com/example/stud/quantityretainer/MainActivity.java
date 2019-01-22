@@ -7,7 +7,6 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -20,10 +19,12 @@ import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.stud.quantityretainer.Dialogs.AddRetentionDialog;
 import com.example.stud.quantityretainer.Dialogs.DeleteConfirmationDialog;
 import com.example.stud.quantityretainer.Dialogs.RenameRetentionDialog;
+import com.example.stud.quantityretainer.Test.ShowAllActivity;
 import com.example.stud.quantityretainer.Utilyties.RetainDBContract;
 import com.example.stud.quantityretainer.Utilyties.RetainDBHelper;
 import com.example.stud.quantityretainer.Utilyties.RetentionsNamesDBHelper;
@@ -79,15 +80,6 @@ public class MainActivity extends AppCompatActivity implements
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.show_all_retentions) {
-            Snackbar.make(findViewById(R.id.fab), "Show all retentions", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show();
-        }
-        return super.onContextItemSelected(item);
     }
 
     @Override
@@ -285,6 +277,12 @@ public class MainActivity extends AppCompatActivity implements
             retentionsDb.close();
         }
 
+    }
+
+    public void onMenuShowAllRetentions(MenuItem item) {
+        Toast.makeText(this, "On menu", Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(this, ShowAllActivity.class);
+        startActivity(intent);
     }
 
 }
