@@ -5,7 +5,10 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteTransactionListener;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
@@ -36,6 +39,16 @@ public class MainActivity extends AppCompatActivity implements
     private SQLiteDatabase mDb;
     private RecyclerView mTopicsRecyclerView;
     private ProgressBar mProgressBar;
+    private HandlerThread mWorkingThread;
+    private Handler mDbThreadHandler;
+    private Cursor mCursor;
+    private MainRecyclerAdapter mMainRecyclerAdapter;
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mWorkingThread.quit();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +57,9 @@ public class MainActivity extends AppCompatActivity implements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        mWorkingThread = new HandlerThread("BackgroundThread");
+        mWorkingThread.start();
+        mDbThreadHandler = new Handler(mWorkingThread.getLooper());
 
         mProgressBar = findViewById(R.id.main_progress_bar);
         mTopicsRecyclerView = findViewById(R.id.topics_recycler_view);
@@ -52,16 +68,13 @@ public class MainActivity extends AppCompatActivity implements
 
         RetentionsNamesDBHelper dbHelper = new RetentionsNamesDBHelper(this);
         mDb = dbHelper.getWritableDatabase();
-        Cursor cursor = getAllRetentions();
-//        if (cursor.getCount() == 0) {
-//            RecordsProvider.writeFakeRetentionsNames(mDb);
-//        }
-        MainRecyclerAdapter mainRecyclerAdapter = new MainRecyclerAdapter(this,
+        getAllRetentionsCursor();
+        mMainRecyclerAdapter = new MainRecyclerAdapter(this,
                 this,
-                cursor);
+                mCursor);
 
 
-        mTopicsRecyclerView.setAdapter(mainRecyclerAdapter);
+        mTopicsRecyclerView.setAdapter(mMainRecyclerAdapter);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -128,19 +141,30 @@ public class MainActivity extends AppCompatActivity implements
         return true;
     }
 
-    private Cursor getAllRetentions() {
-        try {
-            return mDb.query(RetainDBContract.Retentions.TABLE_NAME,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    RetainDBContract.Retentions._ID);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+    private void getAllRetentionsCursor() {
+        mDbThreadHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mCursor = mDb.query(RetainDBContract.Retentions.TABLE_NAME,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            RetainDBContract.Retentions._ID);
+                    mMainRecyclerAdapter.setCursor(mCursor);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mMainRecyclerAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -156,38 +180,41 @@ public class MainActivity extends AppCompatActivity implements
 //                .setAction("Action", null).show();
     }
 
-    private void addRetentionToDB(String name) {
+    private void addRetentionToDB(final String name) {
         if (name == null || name.isEmpty()) {
             return;
         }
 
-        try {
-            mDb.beginTransaction();
-            ContentValues cv = new ContentValues();
-            cv.put(RetainDBContract.Retentions.COLUMN_RETENTION_NAME, name);
-            long id = mDb.insert(RetainDBContract.Retentions.TABLE_NAME, null, cv);
-            if (id != -1) {
-                String tableName = "table" + id;
-                cv.put(RetainDBContract.Retentions._ID, id);
-                cv.put(RetainDBContract.Retentions.COLUMN_TABLE_NAME, tableName);
-                mDb.replaceOrThrow(RetainDBContract.Retentions.TABLE_NAME, null, cv);
-                mDb.setTransactionSuccessful();
+        mDbThreadHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mDb.beginTransaction();
+                    ContentValues cv = new ContentValues();
+                    cv.put(RetainDBContract.Retentions.COLUMN_RETENTION_NAME, name);
+                    long id = mDb.insert(RetainDBContract.Retentions.TABLE_NAME, null, cv);
+                    if (id != -1) {
+                        String tableName = "table" + id;
+                        cv.put(RetainDBContract.Retentions._ID, id);
+                        cv.put(RetainDBContract.Retentions.COLUMN_TABLE_NAME, tableName);
+                        mDb.replaceOrThrow(RetainDBContract.Retentions.TABLE_NAME, null, cv);
+                        mDb.setTransactionSuccessful();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return;
+                } finally {
+                    mDb.endTransaction();
+                }
+                getAllRetentionsCursor();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        } finally {
-            mDb.endTransaction();
-        }
-
-        Cursor cursor = getAllRetentions();
-        MainRecyclerAdapter adapter = new MainRecyclerAdapter(this, this, cursor);
-        mTopicsRecyclerView.setAdapter(adapter);
+        });
     }
 
     private void renameRetention(TextView view, final String tableName) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         RenameRetentionDialog dialog = new RenameRetentionDialog();
+        dialog.setOldName(view.getText().toString());
         dialog.setOnClickListener(new RenameRetentionDialog.RenameRetentionONClickListener() {
             @Override
             public void onDialogClickRename(String newName) {
@@ -197,44 +224,46 @@ public class MainActivity extends AppCompatActivity implements
         dialog.show(fragmentManager, "rename");
     }
 
-    void writeNewRetentionNameToDB(String newName, String tableName) {
-        Cursor cursor = null;
-        try {
-            cursor = mDb.query(RetainDBContract.Retentions.TABLE_NAME,
-                    null,
-                    RetainDBContract.Retentions.COLUMN_TABLE_NAME + "=?",
-                    new String[] {tableName},
-                    null,
-                    null,
-                    RetainDBContract.Retentions._ID);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
+    void writeNewRetentionNameToDB(final String newName, final String tableName) {
+        mDbThreadHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                Cursor cursor = null;
+                try {
+                    cursor = mDb.query(RetainDBContract.Retentions.TABLE_NAME,
+                            null,
+                            RetainDBContract.Retentions.COLUMN_TABLE_NAME + "=?",
+                            new String[] {tableName},
+                            null,
+                            null,
+                            RetainDBContract.Retentions._ID);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return;
+                }
 
-        if (cursor.moveToFirst()) {
-            int columnIDIndex = cursor.getColumnIndex(RetainDBContract.Retentions._ID);
-            long ID = cursor.getLong(columnIDIndex);
-            long retId = 0;
-            ContentValues cv = new ContentValues();
-            cv.put(RetainDBContract.Retentions._ID, ID);
-            cv.put(RetainDBContract.Retentions.COLUMN_TABLE_NAME, tableName);
-            cv.put(RetainDBContract.Retentions.COLUMN_RETENTION_NAME, newName);
-            try {
-                mDb.beginTransaction();
-                retId = mDb.replaceOrThrow(RetainDBContract.Retentions.TABLE_NAME,
-                        null,
-                        cv);
-                mDb.setTransactionSuccessful();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } finally {
-                mDb.endTransaction();
+                if ((cursor != null) && cursor.moveToFirst()) {
+                    int columnIDIndex = cursor.getColumnIndex(RetainDBContract.Retentions._ID);
+                    long ID = cursor.getLong(columnIDIndex);
+                    ContentValues cv = new ContentValues();
+                    cv.put(RetainDBContract.Retentions._ID, ID);
+                    cv.put(RetainDBContract.Retentions.COLUMN_TABLE_NAME, tableName);
+                    cv.put(RetainDBContract.Retentions.COLUMN_RETENTION_NAME, newName);
+                    try {
+                        mDb.beginTransaction();
+                        mDb.replaceOrThrow(RetainDBContract.Retentions.TABLE_NAME,
+                                null,
+                                cv);
+                        mDb.setTransactionSuccessful();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    } finally {
+                        mDb.endTransaction();
+                    }
+                    getAllRetentionsCursor();
+                }
             }
-            cursor = getAllRetentions();
-            MainRecyclerAdapter adapter = new MainRecyclerAdapter(this, this, cursor);
-            mTopicsRecyclerView.setAdapter(adapter);
-        }
+        });
     }
 
     void deleteRetention(final String tableName) {
@@ -243,39 +272,61 @@ public class MainActivity extends AppCompatActivity implements
         dialog.setOnDeleteClickListener(new DeleteConfirmationDialog.RenameRetentionONClickListener() {
             @Override
             public void onDialogClickDelete() {
-
+                deleteRetentionFromDB(tableName);
             }
         });
         dialog.show(manager, "deleteDialog");
     }
 
-    void deleteRetentionFromDB(String tableName) {
-        try {
-            mDb.beginTransaction();
-            mDb.delete(RetainDBContract.Retentions.TABLE_NAME,
-                    RetainDBContract.Retentions.TABLE_NAME + "=?",
-                    new String[] {tableName});
-            mDb.endTransaction();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            mDb.setTransactionSuccessful();
-        }
-        SQLiteDatabase retentionsDb = null;
-        try {
-            retentionsDb = new RetainDBHelper(this,
-                    RetainDBContract.RetainEntity.TABLE_NAME).getWritableDatabase();
-            retentionsDb.beginTransaction();
-            retentionsDb.delete(RetainDBContract.RetainEntity.TABLE_NAME,
-                    RetainDBContract.RetainEntity.TABLE_NAME + "=?",
-                    new String[] {tableName});
-            retentionsDb.endTransaction();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            retentionsDb.setTransactionSuccessful();
-            retentionsDb.close();
-        }
+    void deleteRetentionFromDB(final String tableName) {
+        mDbThreadHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mDb.beginTransactionWithListener(new SQLiteTransactionListener() {
+                        @Override
+                        public void onBegin() {
+
+                        }
+
+                        @Override
+                        public void onCommit() {
+                            getAllRetentionsCursor();
+                        }
+
+                        @Override
+                        public void onRollback() {
+
+                        }
+                    });
+//                    mDb.beginTransaction();
+                    mDb.delete(RetainDBContract.Retentions.TABLE_NAME,
+                            RetainDBContract.Retentions.COLUMN_TABLE_NAME + "=?",
+                            new String[] {tableName});
+                    mDb.setTransactionSuccessful();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    mDb.endTransaction();
+                }
+                SQLiteDatabase retentionsDb = null;
+                try {
+                    retentionsDb = new RetainDBHelper(getApplicationContext(),
+                            RetainDBContract.RetainEntity.TABLE_NAME).getWritableDatabase();
+                    retentionsDb.beginTransaction();
+                    retentionsDb.delete(RetainDBContract.RetainEntity.TABLE_NAME,
+                            RetainDBContract.RetainEntity.COLUMN_NAME + "=?",
+                            new String[] {tableName});
+                    retentionsDb.setTransactionSuccessful();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    retentionsDb.endTransaction();
+                    retentionsDb.close();
+                }
+            }
+        });
+
 
     }
 

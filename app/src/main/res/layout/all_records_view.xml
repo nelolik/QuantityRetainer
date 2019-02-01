@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="32dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/retreat_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        style="@style/RecordItem"/>
+
+    <android.support.constraint.Guideline
+        android:id="@+id/horizontal_middle1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.3"/>
+
+    <TextView
+        android:id="@+id/retreat_date"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:layout_constraintStart_toEndOf="@id/horizontal_middle1"
+        app:layout_constraintLeft_toRightOf="@id/horizontal_middle1"
+        app:layout_constraintTop_toTopOf="parent"
+        style="@style/RecordItem"/>
+
+    <android.support.constraint.Guideline
+        android:id="@+id/horizontal_middle2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.7"/>
+
+    <TextView
+        android:id="@+id/retreat_table"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:layout_constraintStart_toEndOf="@id/horizontal_middle2"
+        app:layout_constraintLeft_toRightOf="@id/horizontal_middle2"
+        app:layout_constraintTop_toTopOf="parent"
+        style="@style/RecordItem"/>
+
+    <View
+        android:id="@+id/item_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginStart="@dimen/padding_divider"
+        android:layout_marginLeft="@dimen/padding_divider"
+        android:layout_marginEnd="@dimen/padding_divider"
+        android:layout_marginRight="@dimen/padding_divider"/>
+
+
+</android.support.constraint.ConstraintLayout>

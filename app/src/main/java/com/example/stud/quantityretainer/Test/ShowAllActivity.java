@@ -8,7 +8,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.example.stud.quantityretainer.R;
-import com.example.stud.quantityretainer.RetentionRecyclerAdapter;
 import com.example.stud.quantityretainer.Utilyties.RetainDBContract;
 import com.example.stud.quantityretainer.Utilyties.RetainDBHelper;
 
@@ -23,15 +22,15 @@ public class ShowAllActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_all);
 
-        mRecyclerView = findViewById(R.id.show_all_retentions);
+        mRecyclerView = findViewById(R.id.all_rec_recycler);
 
         RetainDBHelper dbHelper = new RetainDBHelper(this, "");
         mDb = dbHelper.getWritableDatabase();
         mCursor = getAllRecords();
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        RetentionRecyclerAdapter adapter =
-                new RetentionRecyclerAdapter(getApplicationContext(), mCursor);
+        ShowAllRecyclerAdapter adapter =
+                new ShowAllRecyclerAdapter(getApplicationContext(), mCursor);
         mRecyclerView.setAdapter(adapter);
 
     }

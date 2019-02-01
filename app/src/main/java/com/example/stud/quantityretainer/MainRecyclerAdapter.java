@@ -15,6 +15,7 @@ import com.example.stud.quantityretainer.Utilyties.RetainDBContract;
 public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapter.TopicViewHolder> {
 
     private Context mContext;
+
     private Cursor mCursor;
 
     private RecordsProvider recordsProvider;
@@ -26,6 +27,10 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
         recordsProvider = new RecordsProvider();
         mItemClickListener = listener;
         mCursor = cursor;
+    }
+
+    public void setCursor(Cursor mCursor) {
+        this.mCursor = mCursor;
     }
 
     @NonNull

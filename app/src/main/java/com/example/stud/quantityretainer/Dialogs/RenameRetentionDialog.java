@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.EditText;
 
 import com.example.stud.quantityretainer.R;
@@ -22,11 +23,9 @@ public class RenameRetentionDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater layoutInflater = getActivity().getLayoutInflater();
-        mText = getDialog().findViewById(R.id.new_name);
-        mText.setText(mOldName);
-//        text.selectAll();
+        View view = layoutInflater.inflate(R.layout.fragment_rename_dialog, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setView(layoutInflater.inflate(R.layout.fragment_rename_dialog, null))
+        builder.setView(view)
                 .setPositiveButton(R.string.rename, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -42,7 +41,17 @@ public class RenameRetentionDialog extends DialogFragment {
 //                        mAddRetentionOnCLick.onDialogClickCancel(AddRetentionDialog.this);
                     }
                 });
-        return builder.create();
+        Dialog dialog = builder.create();
+        return dialog;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mText = getDialog().findViewById(R.id.new_name);
+        mText.setText(mOldName);
+        mText.selectAll();
+
     }
 
     public void setOldName(String mOldName) {
