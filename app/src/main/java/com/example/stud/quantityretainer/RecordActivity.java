@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,16 +30,22 @@ public class RecordActivity extends AppCompatActivity {
     private EditText mAddCount;
     private Button mAddButton;
     private RecyclerView mCountRecycler;
+    private RetentionRecyclerAdapter mAdapter;
     private String mRetentionName;
     private String mCountName;
     private SQLiteDatabase mDb;
     private Cursor mCursor;
+    private HandlerThread mWorkingThread;
+    private Handler mDbThreadHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record);
 
+        mWorkingThread = new HandlerThread("RetentionThread");
+        mWorkingThread.start();
+        mDbThreadHandler = new Handler(mWorkingThread.getLooper());
 
         mTotalText = findViewById(R.id.total_text);
         mTotalCount = findViewById(R.id.total_count);
@@ -55,13 +63,11 @@ public class RecordActivity extends AppCompatActivity {
             mCountName = intent.getStringExtra(TAG_TABLE);
             RetainDBHelper dbHelper = new RetainDBHelper(this, mCountName);
             mDb = dbHelper.getWritableDatabase();
-            mCursor = getAllRecords();
-            mTotalCount.setText(String.valueOf(getTotalCount(mCursor)));
         }
         mCountRecycler.setLayoutManager(new LinearLayoutManager(this));
-        RetentionRecyclerAdapter adapter =
-                new RetentionRecyclerAdapter(getApplicationContext(), mCursor);
-        mCountRecycler.setAdapter(adapter);
+        mAdapter = new RetentionRecyclerAdapter(getApplicationContext(), mCursor);
+        mCountRecycler.setAdapter(mAdapter);
+        getAllRecordsAndShow();
 
         mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,10 +78,33 @@ public class RecordActivity extends AppCompatActivity {
         });
     }
 
-    private Cursor getAllRecords() {
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mWorkingThread.quit();
+    }
+
+    private void getAllRecordsAndShow() {
+        mDbThreadHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                getAllRecords();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mTotalCount.setText(String.valueOf(getTotalCount(mCursor)));
+                        mAdapter.setCursor(mCursor);
+                        mAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        });
+    }
+
+    private void getAllRecords() {
         try {
             String selection = RetainDBContract.RetainEntity.COLUMN_NAME + "=?";
-            return mDb.query(RetainDBContract.RetainEntity.TABLE_NAME,
+            mCursor = mDb.query(RetainDBContract.RetainEntity.TABLE_NAME,
                     null,
                     selection,
                     new String[]{mCountName},
@@ -85,7 +114,6 @@ public class RecordActivity extends AppCompatActivity {
                     );
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
     }
 
@@ -104,25 +132,27 @@ public class RecordActivity extends AppCompatActivity {
     }
 
     private void addNewCount() {
-        int newCount = Integer.parseInt(mAddCount.getText().toString());
+        final int newCount = Integer.parseInt(mAddCount.getText().toString());
 
-        ContentValues cv = new ContentValues();
-        cv.put(RetainDBContract.RetainEntity.COLUMN_COUNT, newCount);
-        cv.put(RetainDBContract.RetainEntity.COLUMN_NAME, mCountName);
-        cv.put(RetainDBContract.RetainEntity.COLUMN_DATE, new Date().getTime());
-        try {
-            mDb.beginTransaction();
-            mDb.insert(RetainDBContract.RetainEntity.TABLE_NAME, null, cv);
-            mDb.setTransactionSuccessful();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            mDb.endTransaction();
-        }
+        mDbThreadHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                ContentValues cv = new ContentValues();
+                cv.put(RetainDBContract.RetainEntity.COLUMN_COUNT, newCount);
+                cv.put(RetainDBContract.RetainEntity.COLUMN_NAME, mCountName);
+                cv.put(RetainDBContract.RetainEntity.COLUMN_DATE, new Date().getTime());
+                try {
+                    mDb.beginTransaction();
+                    mDb.insert(RetainDBContract.RetainEntity.TABLE_NAME, null, cv);
+                    mDb.setTransactionSuccessful();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    mDb.endTransaction();
+                }
 
-        mCursor = getAllRecords();
-        RetentionRecyclerAdapter adapter =
-                new RetentionRecyclerAdapter(this, mCursor);
-        mCountRecycler.setAdapter(adapter);
+                getAllRecordsAndShow();
+            }
+        });
     }
 }

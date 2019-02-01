@@ -19,6 +19,11 @@ public class RetentionRecyclerAdapter extends RecyclerView.Adapter<RetentionRecy
     private Context mContext;
     private Cursor mCursor;
 
+    public void setCursor(Cursor mCursor) {
+        this.mCursor = mCursor;
+    }
+
+
     public RetentionRecyclerAdapter(Context context, Cursor cursor) {
         mContext = context;
         mCursor = cursor;

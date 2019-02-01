@@ -20,9 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.stud.quantityretainer.Dialogs.AddRetentionDialog;
 import com.example.stud.quantityretainer.Dialogs.DeleteConfirmationDialog;
@@ -38,7 +36,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private SQLiteDatabase mDb;
     private RecyclerView mTopicsRecyclerView;
-    private ProgressBar mProgressBar;
     private HandlerThread mWorkingThread;
     private Handler mDbThreadHandler;
     private Cursor mCursor;
@@ -61,7 +58,6 @@ public class MainActivity extends AppCompatActivity implements
         mWorkingThread.start();
         mDbThreadHandler = new Handler(mWorkingThread.getLooper());
 
-        mProgressBar = findViewById(R.id.main_progress_bar);
         mTopicsRecyclerView = findViewById(R.id.topics_recycler_view);
 
         mTopicsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -331,7 +327,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void onMenuShowAllRetentions(MenuItem item) {
-        Toast.makeText(this, "On menu", Toast.LENGTH_LONG).show();
         Intent intent = new Intent(this, ShowAllActivity.class);
         startActivity(intent);
     }

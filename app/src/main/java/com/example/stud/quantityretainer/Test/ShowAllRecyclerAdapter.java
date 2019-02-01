@@ -20,6 +20,11 @@ public class ShowAllRecyclerAdapter extends RecyclerView.Adapter<ShowAllRecycler
     private Context mContext;
     private Cursor mCursor;
 
+    public void setCursor(Cursor cursor) {
+        this.mCursor = cursor;
+    }
+
+
     public ShowAllRecyclerAdapter(Context context, Cursor cursor) {
         mContext = context;
         mCursor = cursor;
