@@ -74,6 +74,7 @@ public class RecordActivity extends AppCompatActivity {
             public void onClick(View v) {
                 addNewCount();
                 mTotalCount.setText(String.valueOf(getTotalCount(mCursor)));
+                mAddCount.selectAll();
             }
         });
     }

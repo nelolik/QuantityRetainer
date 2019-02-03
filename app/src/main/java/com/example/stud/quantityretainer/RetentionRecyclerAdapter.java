@@ -18,15 +18,23 @@ public class RetentionRecyclerAdapter extends RecyclerView.Adapter<RetentionRecy
 
     private Context mContext;
     private Cursor mCursor;
+    private int totalCount;
 
     public void setCursor(Cursor mCursor) {
         this.mCursor = mCursor;
+        if (mCursor != null) {
+            totalCount = mCursor.getCount();
+        }
+
     }
 
 
     public RetentionRecyclerAdapter(Context context, Cursor cursor) {
         mContext = context;
         mCursor = cursor;
+        if (mCursor != null) {
+            totalCount = mCursor.getCount();
+        }
     }
 
     @NonNull
@@ -40,8 +48,6 @@ public class RetentionRecyclerAdapter extends RecyclerView.Adapter<RetentionRecy
     @Override
     public void onBindViewHolder(@NonNull RecordViewHolder holder, int position) {
         if (mCursor == null || !mCursor.moveToPosition(position)) {
-            holder.mCount.setText("1");
-            holder.mDate.setText("2");
             return;
         }
         int columnIndex = mCursor.getColumnIndex(RetainDBContract.RetainEntity.COLUMN_COUNT);
@@ -52,6 +58,11 @@ public class RetentionRecyclerAdapter extends RecyclerView.Adapter<RetentionRecy
         Date  date = new Date(timestamp);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMM YYYY");
         holder.mDate.setText(simpleDateFormat.format(date));
+        if (totalCount > 0 && (position == (totalCount - 1))) {
+            holder.mDivider.setVisibility(View.INVISIBLE);
+        } else {
+            holder.mDivider.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -66,10 +77,12 @@ public class RetentionRecyclerAdapter extends RecyclerView.Adapter<RetentionRecy
 
         TextView mCount;
         TextView mDate;
+        View mDivider;
         public RecordViewHolder(View itemView) {
             super(itemView);
             mCount = itemView.findViewById(R.id.retreat_count);
             mDate = itemView.findViewById(R.id.retreat_date);
+            mDivider = itemView.findViewById(R.id.item_divider);
         }
     }
 }
