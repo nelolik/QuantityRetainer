@@ -11,7 +11,7 @@
     <item
         android:id="@+id/show_all_retentions"
         android:orderInCategory="100"
-        android:title="Show all retentions"
+        android:title="@string/show_all_retentions"
         app:showAsAction="never"
         android:onClick="onMenuShowAllRetentions"/>
 </menu>
