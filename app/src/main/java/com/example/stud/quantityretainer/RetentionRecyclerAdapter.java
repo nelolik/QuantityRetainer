@@ -50,7 +50,7 @@ public class RetentionRecyclerAdapter extends RecyclerView.Adapter<RetentionRecy
         long timestamp = mCursor.getLong(columnIndex);
         holder.mCount.setText(String.valueOf(count));
         Date  date = new Date(timestamp);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("DD MMM YYYY");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMM YYYY");
         holder.mDate.setText(simpleDateFormat.format(date));
     }
 
