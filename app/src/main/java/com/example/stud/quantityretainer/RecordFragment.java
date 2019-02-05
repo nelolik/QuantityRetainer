@@ -1,16 +1,20 @@
 package com.example.stud.quantityretainer;
 
+
 import android.content.ContentValues;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.v7.app.AppCompatActivity;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -21,7 +25,10 @@ import com.example.stud.quantityretainer.Utilyties.RetainDBHelper;
 import java.util.Date;
 
 
-public class RecordActivity extends AppCompatActivity {
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class RecordFragment extends Fragment {
     public static final String TAG_NAME = "RETENTION_NAME";
     public static final String TAG_TABLE = "TABLE_NAME";
 
@@ -38,36 +45,53 @@ public class RecordActivity extends AppCompatActivity {
     private HandlerThread mWorkingThread;
     private Handler mDbThreadHandler;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_record);
+    public RecordFragment() {
+        // Required empty public constructor
+    }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        RetainDBHelper dbHelper = new RetainDBHelper(getContext());
+        mDb = dbHelper.getWritableDatabase();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_record, container, false);
         mWorkingThread = new HandlerThread("RetentionThread");
         mWorkingThread.start();
         mDbThreadHandler = new Handler(mWorkingThread.getLooper());
 
-        mTotalText = findViewById(R.id.total_text);
-        mTotalCount = findViewById(R.id.total_count);
-        mAddCount = findViewById(R.id.add_count_input);
-        mAddButton = findViewById(R.id.btn_add);
-        mCountRecycler = findViewById(R.id.count_recycler);
+        mTotalText = view.findViewById(R.id.total_text);
+        mTotalCount = view.findViewById(R.id.total_count);
+        mAddCount = view.findViewById(R.id.add_count_input);
+        mAddButton = view.findViewById(R.id.btn_add);
+        mCountRecycler = view.findViewById(R.id.count_recycler);
 
-        Intent intent = getIntent();
+        setHasOptionsMenu(true);
 
-        if (intent.hasExtra(TAG_NAME)) {
-            mRetentionName = intent.getStringExtra(TAG_NAME);
-            getSupportActionBar().setTitle(mRetentionName);
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            if (arguments.containsKey(TAG_NAME)) {
+                mRetentionName = getArguments().getString(TAG_NAME);
+            }
+            if (arguments.containsKey(TAG_TABLE)) {
+                mCountName = getArguments().getString(TAG_TABLE);
+            }
         }
-        if (intent.hasExtra(TAG_TABLE)) {
-            mCountName = intent.getStringExtra(TAG_TABLE);
-            RetainDBHelper dbHelper = new RetainDBHelper(this, mCountName);
-            mDb = dbHelper.getWritableDatabase();
-        }
-        mCountRecycler.setLayoutManager(new LinearLayoutManager(this));
-        mAdapter = new RetentionRecyclerAdapter(getApplicationContext(), mCursor);
-        mCountRecycler.setAdapter(mAdapter);
-        getAllRecordsAndShow();
+
+//        if (intent.hasExtra(TAG_NAME)) {
+//            mRetentionName = intent.getStringExtra(TAG_NAME);
+//            getActivity().getActionBar().setTitle(mRetentionName);
+//        }
+//        if (intent.hasExtra(TAG_TABLE)) {
+//            mCountName = intent.getStringExtra(TAG_TABLE);
+//            RetainDBHelper dbHelper = new RetainDBHelper(this, mCountName);
+//            mDb = dbHelper.getWritableDatabase();
+//        }
 
         mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,10 +101,21 @@ public class RecordActivity extends AppCompatActivity {
                 mAddCount.selectAll();
             }
         });
+
+        return view;
     }
 
     @Override
-    protected void onDestroy() {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mCountRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        mAdapter = new RetentionRecyclerAdapter(getContext(), mCursor);
+        mCountRecycler.setAdapter(mAdapter);
+        getAllRecordsAndShow();
+    }
+
+    @Override
+    public void onDestroy() {
         super.onDestroy();
         mWorkingThread.quit();
     }
@@ -90,7 +125,7 @@ public class RecordActivity extends AppCompatActivity {
             @Override
             public void run() {
                 getAllRecords();
-                runOnUiThread(new Runnable() {
+                getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         mTotalCount.setText(String.valueOf(getTotalCount(mCursor)));
@@ -112,7 +147,7 @@ public class RecordActivity extends AppCompatActivity {
                     null,
                     null,
                     RetainDBContract.RetainEntity._ID + " DESC"
-                    );
+            );
         } catch (Exception e) {
             e.printStackTrace();
         }

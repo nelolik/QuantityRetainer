@@ -10,4 +10,5 @@
     <string name="enter_new_name">Enter new name</string>
     <string name="confirm_delete">Delete selected element?</string>
     <string name="show_all_retentions">Show all retentions</string>
+
 </resources>

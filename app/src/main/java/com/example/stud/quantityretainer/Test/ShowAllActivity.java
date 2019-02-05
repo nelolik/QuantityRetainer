@@ -34,7 +34,7 @@ public class ShowAllActivity extends AppCompatActivity {
 
         mRecyclerView = findViewById(R.id.all_rec_recycler);
 
-        RetainDBHelper dbHelper = new RetainDBHelper(this, "");
+        RetainDBHelper dbHelper = new RetainDBHelper(this);
         mDb = dbHelper.getWritableDatabase();
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
