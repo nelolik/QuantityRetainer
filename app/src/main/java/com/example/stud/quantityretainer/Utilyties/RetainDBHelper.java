@@ -15,9 +15,8 @@ public class RetainDBHelper extends SQLiteOpenHelper {
 
     private String mTableName;
 
-    public RetainDBHelper (Context context, String tableName) {
+    public RetainDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        mTableName = tableName;
     }
 
     @Override
