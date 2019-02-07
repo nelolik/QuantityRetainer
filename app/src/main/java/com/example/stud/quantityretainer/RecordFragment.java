@@ -83,16 +83,6 @@ public class RecordFragment extends android.support.v4.app.Fragment {
             }
         }
 
-//        if (intent.hasExtra(TAG_NAME)) {
-//            mRetentionName = intent.getStringExtra(TAG_NAME);
-//            getActivity().getActionBar().setTitle(mRetentionName);
-//        }
-//        if (intent.hasExtra(TAG_TABLE)) {
-//            mCountName = intent.getStringExtra(TAG_TABLE);
-//            RetainDBHelper dbHelper = new RetainDBHelper(this, mCountName);
-//            mDb = dbHelper.getWritableDatabase();
-//        }
-
         mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -101,9 +91,11 @@ public class RecordFragment extends android.support.v4.app.Fragment {
                 mAddCount.selectAll();
             }
         });
+
         ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle(mRetentionName);
+            actionBar.setDisplayHomeAsUpEnabled(true);
         }
         return view;
     }

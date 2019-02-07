@@ -38,4 +38,14 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        if (getSupportFragmentManager().getBackStackEntryCount()>0) {
+            getSupportFragmentManager().popBackStack();
+            return true;
+        } else {
+            return super.onSupportNavigateUp();
+        }
+    }
+
 }
