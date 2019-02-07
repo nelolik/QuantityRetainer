@@ -10,6 +10,8 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -28,7 +30,7 @@ import java.util.Date;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RecordFragment extends Fragment {
+public class RecordFragment extends android.support.v4.app.Fragment {
     public static final String TAG_NAME = "RETENTION_NAME";
     public static final String TAG_TABLE = "TABLE_NAME";
 
@@ -71,8 +73,6 @@ public class RecordFragment extends Fragment {
         mAddButton = view.findViewById(R.id.btn_add);
         mCountRecycler = view.findViewById(R.id.count_recycler);
 
-        setHasOptionsMenu(true);
-
         Bundle arguments = getArguments();
         if (arguments != null) {
             if (arguments.containsKey(TAG_NAME)) {
@@ -101,7 +101,10 @@ public class RecordFragment extends Fragment {
                 mAddCount.selectAll();
             }
         });
-
+        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(mRetentionName);
+        }
         return view;
     }
 
