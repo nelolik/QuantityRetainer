@@ -53,6 +53,8 @@ public class RecordActivity extends AppCompatActivity {
         mAddButton = findViewById(R.id.btn_add);
         mCountRecycler = findViewById(R.id.count_recycler);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         Intent intent = getIntent();
 
         if (intent.hasExtra(TAG_NAME)) {
