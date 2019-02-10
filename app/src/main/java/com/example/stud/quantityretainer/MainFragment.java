@@ -76,6 +76,7 @@ public class MainFragment extends Fragment implements
         mTopicsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
+        fab.setRippleColor(getResources().getColor(R.color.secondaryLightColor));
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
