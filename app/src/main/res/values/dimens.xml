@@ -3,4 +3,5 @@
     <dimen name="topic_vh_name">48dp</dimen>
     <dimen name="count_in_width">144dp</dimen>
     <dimen name="padding_divider">8dp</dimen>
+    <dimen name="margin_text_bottom_shit">4dp</dimen>
 </resources>

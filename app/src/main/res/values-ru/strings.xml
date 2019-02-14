@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">QuantityRetainer</string>
+    <string name="app_name">Cчётчик повторений</string>
     <string name="action_settings">Настройки</string>
     <string name="add">Добавить</string>
     <string name="cancel">Отмена</string>
@@ -10,4 +10,5 @@
     <string name="enter_new_name">Введите новое имя</string>
     <string name="confirm_delete">Удалить выделеный элемент?</string>
     <string name="show_all_retentions">Показать все сохранения</string>
+    <string name="enter_add_on_tap">Инкремент по нажатию:</string>
 </resources>

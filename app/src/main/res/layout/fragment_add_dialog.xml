@@ -13,10 +13,10 @@
 
     <EditText
         android:id="@+id/new_retention_name"
+        style="@style/Dialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:inputType="textPersonName"
-        style="@style/Dialog"/>
+        android:inputType="textPersonName" />
 
 </LinearLayout>

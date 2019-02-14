@@ -38,6 +38,8 @@ public class RecordFragment extends android.support.v4.app.Fragment {
     TextView mTotalCount;
     private EditText mAddCount;
     private Button mAddButton;
+    private EditText mAddOnTap;
+    private TextView mTapField;
     private RecyclerView mCountRecycler;
     private RetentionRecyclerAdapter mAdapter;
     private String mRetentionName;
@@ -72,6 +74,20 @@ public class RecordFragment extends android.support.v4.app.Fragment {
         mAddCount = view.findViewById(R.id.add_count_input);
         mAddButton = view.findViewById(R.id.btn_add);
         mCountRecycler = view.findViewById(R.id.count_recycler);
+        mAddOnTap = view.findViewById(R.id.increment_count_input);
+        mTapField = view.findViewById(R.id.tap_field);
+        mTapField.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String prevAddStr = mAddCount.getText().toString();
+                String addOnTap = mAddOnTap.getText().toString();
+                if (prevAddStr.isEmpty()) { prevAddStr = "0"; }
+                if (addOnTap.isEmpty()) { addOnTap = "0"; }
+                int add =  Integer.parseInt(addOnTap);
+                int prevAdd = Integer.parseInt(prevAddStr);
+                mAddCount.setText(String.valueOf(add + prevAdd));
+            }
+        });
 
         Bundle arguments = getArguments();
         if (arguments != null) {
@@ -97,6 +113,7 @@ public class RecordFragment extends android.support.v4.app.Fragment {
             actionBar.setTitle(mRetentionName);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
         return view;
     }
 
