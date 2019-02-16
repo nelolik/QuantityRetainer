@@ -7,9 +7,9 @@
     <color name="primaryColor">#ffca28</color>
     <color name="primaryLightColor">#fffd61</color>
     <color name="primaryDarkColor">#c79a00</color>
-    <color name="secondaryColor">#ef6c00</color>
-    <color name="secondaryLightColor">#ff9d3f</color>
-    <color name="secondaryDarkColor">#b53d00</color>
-    <color name="primaryTextColor">#212121</color>
+    <color name="secondaryColor">#ff9800</color>
+    <color name="secondaryLightColor">#ffc947</color>
+    <color name="secondaryDarkColor">#c66900</color>
+    <color name="primaryTextColor">#000000</color>
     <color name="secondaryTextColor">#000000</color>
 </resources>
