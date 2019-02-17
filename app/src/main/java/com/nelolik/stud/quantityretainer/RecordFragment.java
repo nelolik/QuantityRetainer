@@ -2,6 +2,8 @@ package com.nelolik.stud.quantityretainer;
 
 
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -33,6 +35,7 @@ import java.util.Date;
 public class RecordFragment extends android.support.v4.app.Fragment {
     public static final String TAG_NAME = "RETENTION_NAME";
     public static final String TAG_TABLE = "TABLE_NAME";
+    public static final String PREF_INCREMENT_SIZE = "pref_increment_size";
 
     TextView mTotalText;
     TextView mTotalCount;
@@ -114,6 +117,10 @@ public class RecordFragment extends android.support.v4.app.Fragment {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        int increment_size = ((AppCompatActivity)getActivity()).getPreferences(Context.MODE_PRIVATE)
+                .getInt(PREF_INCREMENT_SIZE, 0);
+        mAddOnTap.setText(String.valueOf(increment_size));
+
         return view;
     }
 
@@ -130,6 +137,15 @@ public class RecordFragment extends android.support.v4.app.Fragment {
     public void onDestroy() {
         super.onDestroy();
         mWorkingThread.quit();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        SharedPreferences.Editor editor = ((AppCompatActivity)getActivity())
+                .getPreferences(Context.MODE_PRIVATE).edit();
+        editor.putInt(PREF_INCREMENT_SIZE, Integer.parseInt(mAddOnTap.getText().toString()));
+        editor.apply();
     }
 
     private void getAllRecordsAndShow() {

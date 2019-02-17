@@ -42,7 +42,7 @@ public class MainFragment extends Fragment implements
         MainRecyclerAdapter.ListItemClickListener,
         AddRetentionDialog.AddRetentionOnCLick {
 
-    public static String BACKSTACK_TAG = "backstak_tag";
+    public static final String BACKSTACK_TAG = "backstak_tag";
 
     private SQLiteDatabase mDb;
     private RecyclerView mTopicsRecyclerView;
