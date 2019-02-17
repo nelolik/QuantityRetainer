@@ -1,4 +1,4 @@
-package com.example.stud.quantityretainer.Test;
+package com.nelolik.stud.quantityretainer.Test;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -9,9 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.example.stud.quantityretainer.R;
-import com.example.stud.quantityretainer.Utilyties.RetainDBContract;
-import com.example.stud.quantityretainer.Utilyties.RetainDBHelper;
+import com.nelolik.stud.quantityretainer.R;
+import com.nelolik.stud.quantityretainer.Utilyties.RetainDBContract;
+import com.nelolik.stud.quantityretainer.Utilyties.RetainDBHelper;
 
 public class ShowAllActivity extends AppCompatActivity {
 

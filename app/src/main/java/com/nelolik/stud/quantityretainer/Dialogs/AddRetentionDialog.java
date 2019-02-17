@@ -1,4 +1,4 @@
-package com.example.stud.quantityretainer.Dialogs;
+package com.nelolik.stud.quantityretainer.Dialogs;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -9,7 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.widget.EditText;
 
-import com.example.stud.quantityretainer.R;
+import com.nelolik.stud.quantityretainer.R;
 
 public class AddRetentionDialog extends DialogFragment {
 

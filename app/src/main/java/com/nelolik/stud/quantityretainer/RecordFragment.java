@@ -1,4 +1,4 @@
-package com.example.stud.quantityretainer;
+package com.nelolik.stud.quantityretainer;
 
 
 import android.content.ContentValues;
@@ -21,8 +21,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.example.stud.quantityretainer.Utilyties.RetainDBContract;
-import com.example.stud.quantityretainer.Utilyties.RetainDBHelper;
+import com.nelolik.stud.quantityretainer.Utilyties.RetainDBContract;
+import com.nelolik.stud.quantityretainer.Utilyties.RetainDBHelper;
 
 import java.util.Date;
 

@@ -1,4 +1,4 @@
-package com.example.stud.quantityretainer.Utilyties;
+package com.nelolik.stud.quantityretainer.Utilyties;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;

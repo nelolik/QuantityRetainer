@@ -1,4 +1,4 @@
-package com.example.stud.quantityretainer.Dialogs;
+package com.nelolik.stud.quantityretainer.Dialogs;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
-import com.example.stud.quantityretainer.R;
+import com.nelolik.stud.quantityretainer.R;
 
 public class RenameRetentionDialog extends DialogFragment {
 

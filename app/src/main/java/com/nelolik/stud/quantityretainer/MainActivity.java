@@ -1,4 +1,4 @@
-package com.example.stud.quantityretainer;
+package com.nelolik.stud.quantityretainer;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -12,7 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 
-import com.example.stud.quantityretainer.Test.ShowAllActivity;
+import com.nelolik.stud.quantityretainer.Test.ShowAllActivity;
 
 public class MainActivity extends AppCompatActivity {
 

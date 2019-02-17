@@ -1,4 +1,4 @@
-package com.example.stud.quantityretainer;
+package com.nelolik.stud.quantityretainer;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -9,8 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.stud.quantityretainer.Utilyties.RecordsProvider;
-import com.example.stud.quantityretainer.Utilyties.RetainDBContract;
+import com.nelolik.stud.quantityretainer.Utilyties.RecordsProvider;
+import com.nelolik.stud.quantityretainer.Utilyties.RetainDBContract;
 
 public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapter.TopicViewHolder> {
 

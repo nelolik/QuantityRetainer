@@ -1,4 +1,4 @@
-package com.example.stud.quantityretainer;
+package com.nelolik.stud.quantityretainer;
 
 
 import android.content.ContentValues;
@@ -27,12 +27,12 @@ import android.view.ViewGroup;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
-import com.example.stud.quantityretainer.Dialogs.AddRetentionDialog;
-import com.example.stud.quantityretainer.Dialogs.DeleteConfirmationDialog;
-import com.example.stud.quantityretainer.Dialogs.RenameRetentionDialog;
-import com.example.stud.quantityretainer.Utilyties.RetainDBContract;
-import com.example.stud.quantityretainer.Utilyties.RetainDBHelper;
-import com.example.stud.quantityretainer.Utilyties.RetentionsNamesDBHelper;
+import com.nelolik.stud.quantityretainer.Dialogs.AddRetentionDialog;
+import com.nelolik.stud.quantityretainer.Dialogs.DeleteConfirmationDialog;
+import com.nelolik.stud.quantityretainer.Dialogs.RenameRetentionDialog;
+import com.nelolik.stud.quantityretainer.Utilyties.RetainDBContract;
+import com.nelolik.stud.quantityretainer.Utilyties.RetainDBHelper;
+import com.nelolik.stud.quantityretainer.Utilyties.RetentionsNamesDBHelper;
 
 
 /**

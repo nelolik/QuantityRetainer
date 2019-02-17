@@ -1,4 +1,4 @@
-package com.example.stud.quantityretainer.Dialogs;
+package com.nelolik.stud.quantityretainer.Dialogs;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -8,7 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.stud.quantityretainer.R;
+import com.nelolik.stud.quantityretainer.R;
 
 public class AddOnTapDialog extends BottomSheetDialogFragment {
 
