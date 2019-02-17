@@ -29,9 +29,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.fragment_container, new MainFragment());
-        fragmentTransaction.commit();
+        if (fragmentManager.getBackStackEntryCount() == 0) {
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.add(R.id.fragment_container, new MainFragment());
+            fragmentTransaction.commit();
+        }
     }
 
     public void onMenuShowAllRetentions(MenuItem item) {
