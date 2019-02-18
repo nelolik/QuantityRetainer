@@ -4,4 +4,10 @@
     <dimen name="count_in_width">144dp</dimen>
     <dimen name="padding_divider">8dp</dimen>
     <dimen name="margin_text_bottom_shit">4dp</dimen>
+    <dimen name="sheet_arrow_width">48dp</dimen>
+    <dimen name="sheet_peek_height">40dp</dimen>
+    <dimen name="sheet_text_top_margin">30dp</dimen>
+    <dimen name="sheet_edit_text_width">100dp</dimen>
+    <dimen name="sheet_corners_radius">16dp</dimen>
+    <dimen name="sheet_tap_field_height">250dp</dimen>
 </resources>
