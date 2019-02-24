@@ -4,6 +4,7 @@ package com.nelolik.stud.quantityretainer;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -41,6 +43,7 @@ public class RecordFragment extends android.support.v4.app.Fragment {
     TextView mTotalCount;
     private EditText mAddCount;
     private Button mAddButton;
+    private NestedScrollView mBottomSheet;
     private EditText mAddOnTap;
     private TextView mTapField;
     private RecyclerView mCountRecycler;
@@ -77,6 +80,7 @@ public class RecordFragment extends android.support.v4.app.Fragment {
         mAddCount = view.findViewById(R.id.add_count_input);
         mAddButton = view.findViewById(R.id.btn_add);
         mCountRecycler = view.findViewById(R.id.count_recycler);
+        mBottomSheet = view.findViewById(R.id.bottom_sheet);
         mAddOnTap = view.findViewById(R.id.increment_count_input);
         mTapField = view.findViewById(R.id.tap_field);
         mTapField.setOnClickListener(new View.OnClickListener() {
@@ -218,5 +222,17 @@ public class RecordFragment extends android.support.v4.app.Fragment {
                 getAllRecordsAndShow();
             }
         });
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        if (newConfig.keyboardHidden == Configuration.KEYBOARDHIDDEN_NO) {
+            if (mAddCount.hasFocus()) {
+                mBottomSheet.scrollTo((int)getResources().getDimension(R.dimen.sheet_peek_height),
+                        0);
+            }
+        }
+
+        super.onConfigurationChanged(newConfig);
     }
 }

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <View
+        android:id="@+id/sheet_indent"
+        android:layout_width="@dimen/sheet_arrow_width"
+        android:layout_height="wrap_content"
+        android:foregroundGravity="center_horizontal"
+        android:background="@drawable/ic_expand_less_black_24dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+    <android.support.constraint.Guideline
+        android:id="@+id/horizontal_middle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5"/>
+
+    <TextView
+        android:id="@+id/increment_count_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="@string/enter_add_on_tap"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toStartOf="@id/horizontal_middle"
+        app:layout_constraintRight_toLeftOf="@id/horizontal_middle"
+        app:layout_constraintBaseline_toBaselineOf="@id/increment_count_input"
+        android:layout_marginTop="@dimen/sheet_text_top_margin"
+        android:layout_marginBottom="@dimen/margin_text_bottom_shit"
+        android:layout_marginStart="@dimen/margin_text_bottom_shit"
+        android:layout_marginLeft="@dimen/margin_text_bottom_shit"
+        android:layout_marginEnd="@dimen/margin_text_bottom_shit"
+        android:layout_marginRight="@dimen/margin_text_bottom_shit"/>
+
+    <EditText
+        android:id="@+id/increment_count_input"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_text_bottom_shit"
+        android:layout_marginTop="@dimen/sheet_text_top_margin"
+        android:width="@dimen/sheet_edit_text_width"
+        android:hint="@string/increment_count_label"
+        android:inputType="number"
+        android:textSize="20sp"
+        app:layout_constraintLeft_toRightOf="@id/horizontal_middle"
+        app:layout_constraintStart_toEndOf="@id/horizontal_middle"
+        app:layout_constraintTop_toTopOf="parent"
+        android:importantForAutofill="no" />
+
+    <TextView
+        android:id="@+id/tap_field"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/sheet_tap_field_height"
+        android:text="@string/tap_to_add"
+        android:textSize="30sp"
+        app:layout_constraintTop_toBottomOf="@id/increment_count_input"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:gravity="center"
+        android:background="@color/secondaryLightColor" />
+
+</android.support.constraint.ConstraintLayout>
