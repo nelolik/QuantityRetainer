@@ -20,6 +20,7 @@
             </intent-filter>
         </activity>
         <activity android:name="com.nelolik.stud.quantityretainer.Test.ShowAllActivity"></activity>
+        <receiver android:name=".RecordFragment$NotificationActionReceiver" />
     </application>
 
 </manifest>

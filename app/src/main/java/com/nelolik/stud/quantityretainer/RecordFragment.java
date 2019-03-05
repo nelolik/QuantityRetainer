@@ -1,18 +1,27 @@
 package com.nelolik.stud.quantityretainer;
 
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -38,6 +47,11 @@ public class RecordFragment extends android.support.v4.app.Fragment {
     public static final String TAG_NAME = "RETENTION_NAME";
     public static final String TAG_TABLE = "TABLE_NAME";
     public static final String PREF_INCREMENT_SIZE = "pref_increment_size";
+    private static final String INCREMENT_CHANNEL = "increment";
+    private static final int NOTIFICATION_ID = 1;
+    private static final int REQUEST_CODE = 0;
+
+    private static RecordFragment instance = null;
 
     TextView mTotalText;
     TextView mTotalCount;
@@ -86,13 +100,7 @@ public class RecordFragment extends android.support.v4.app.Fragment {
         mTapField.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String prevAddStr = mAddCount.getText().toString();
-                String addOnTap = mAddOnTap.getText().toString();
-                if (prevAddStr.isEmpty()) { prevAddStr = "0"; }
-                if (addOnTap.isEmpty()) { addOnTap = "0"; }
-                int add =  Integer.parseInt(addOnTap);
-                int prevAdd = Integer.parseInt(prevAddStr);
-                mAddCount.setText(String.valueOf(add + prevAdd));
+                addOnTap();
             }
         });
 
@@ -124,8 +132,25 @@ public class RecordFragment extends android.support.v4.app.Fragment {
         int increment_size = ((AppCompatActivity)getActivity()).getPreferences(Context.MODE_PRIVATE)
                 .getInt(PREF_INCREMENT_SIZE, 0);
         mAddOnTap.setText(String.valueOf(increment_size));
-
+        if (mCountName != null) {
+            int previousAddCount = ((AppCompatActivity) getActivity()).getPreferences(Context.MODE_PRIVATE)
+                    .getInt(mCountName, 0);
+            mAddCount.setText(String.valueOf(previousAddCount));
+        } else {
+            mAddCount.setText("0");
+        }
+        instance = this;
         return view;
+    }
+
+    private void addOnTap() {
+        String prevAddStr = mAddCount.getText().toString();
+        String addOnTap = mAddOnTap.getText().toString();
+        if (prevAddStr.isEmpty()) { prevAddStr = "0"; }
+        if (addOnTap.isEmpty()) { addOnTap = "0"; }
+        int add =  Integer.parseInt(addOnTap);
+        int prevAdd = Integer.parseInt(prevAddStr);
+        mAddCount.setText(String.valueOf(add + prevAdd));
     }
 
     @Override
@@ -139,8 +164,16 @@ public class RecordFragment extends android.support.v4.app.Fragment {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         mWorkingThread.quit();
+        cancelNotification();
+        instance = null;
+        super.onDestroy();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        showNotification();
     }
 
     @Override
@@ -149,6 +182,9 @@ public class RecordFragment extends android.support.v4.app.Fragment {
         SharedPreferences.Editor editor = ((AppCompatActivity)getActivity())
                 .getPreferences(Context.MODE_PRIVATE).edit();
         editor.putInt(PREF_INCREMENT_SIZE, Integer.parseInt(mAddOnTap.getText().toString()));
+        if (mCountName != null) {
+            editor.putInt(mCountName, Integer.parseInt(mAddCount.getText().toString()));
+        }
         editor.apply();
     }
 
@@ -235,4 +271,90 @@ public class RecordFragment extends android.support.v4.app.Fragment {
 
         super.onConfigurationChanged(newConfig);
     }
+
+    public void createMessagesNotificationChannel(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = context
+                    .getString(R.string.inrement_channel_name);
+            NotificationChannel channel = new NotificationChannel(
+                    INCREMENT_CHANNEL,
+                    name,
+                    NotificationManager.IMPORTANCE_LOW);
+            channel.enableVibration(false);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            NotificationManager notificationManager =
+                    context.getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
+    }
+
+    private void showNotification() {
+        Context context = getContext();
+        if (context == null) {
+            return;
+        }
+        createMessagesNotificationChannel(context);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context,
+                INCREMENT_CHANNEL);
+        String title = getString(R.string.add_count_label) + " " + mAddCount.getText().toString();
+        String text = getString(R.string.enter_add_on_tap) + " " + mAddOnTap.getText().toString();
+
+        Intent addAction = new Intent(context,
+                RecordFragment.NotificationActionReceiver.class);
+        addAction.setAction(NotificationActionReceiver.ADD_PRESSED_ACTION);
+        PendingIntent addIntent = PendingIntent.getBroadcast(context,
+                REQUEST_CODE, addAction, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        builder.setSmallIcon(R.drawable.mala_notification)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setDefaults(NotificationCompat.VISIBILITY_PUBLIC)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setOngoing(true)
+                .addAction(new NotificationCompat.Action.Builder(
+                        R.drawable.ic_add_box_black_24dp,
+                        "Add",
+                        addIntent).build())
+        ;
+
+        NotificationManagerCompat notificationManager =
+                NotificationManagerCompat.from(getContext());
+        notificationManager.notify(NOTIFICATION_ID, builder.build());
+    }
+
+    private void cancelNotification() {
+        Context context = getContext();
+        if (context == null) {
+            return;
+        }
+        NotificationManagerCompat notificationManager =
+                NotificationManagerCompat.from(getContext());
+        notificationManager.cancel(NOTIFICATION_ID);
+    }
+
+    public static RecordFragment getInstance() {
+        return instance;
+    }
+
+    public static class NotificationActionReceiver extends BroadcastReceiver {
+        public static final String ADD_PRESSED_ACTION =
+                "com.nelolik.stud.quantityretainer.ADD_PRESSED_ACTION";
+
+        public NotificationActionReceiver() {}
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            RecordFragment fragment = RecordFragment.getInstance();
+            if (fragment == null) {
+                return;
+            }
+            fragment.addOnTap();
+            fragment.showNotification();
+        }
+    }
+
+
+
 }

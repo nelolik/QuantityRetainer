@@ -14,4 +14,5 @@
     <string name="tap_to_add">Добавить</string>
     <string name="add_count_label">Добавляемое число</string>
     <string name="increment_count_label">Число, добавляемое по нажатию</string>
+    <string name="inrement_channel_name">Добавить новый круг</string>
 </resources>
