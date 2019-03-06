@@ -275,7 +275,7 @@ public class RecordFragment extends android.support.v4.app.Fragment {
     public void createMessagesNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = context
-                    .getString(R.string.inrement_channel_name);
+                    .getString(R.string.inсrement_channel_name);
             NotificationChannel channel = new NotificationChannel(
                     INCREMENT_CHANNEL,
                     name,
@@ -298,7 +298,7 @@ public class RecordFragment extends android.support.v4.app.Fragment {
         createMessagesNotificationChannel(context);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context,
                 INCREMENT_CHANNEL);
-        String title = getString(R.string.add_count_label) + " " + mAddCount.getText().toString();
+        String title = getString(R.string.notification_title) + " " + mAddCount.getText().toString();
         String text = getString(R.string.enter_add_on_tap) + " " + mAddOnTap.getText().toString();
 
         Intent addAction = new Intent(context,
@@ -313,6 +313,7 @@ public class RecordFragment extends android.support.v4.app.Fragment {
                 .setDefaults(NotificationCompat.VISIBILITY_PUBLIC)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setOngoing(true)
+                .setColor(getResources().getColor(R.color.primaryColor))
                 .addAction(new NotificationCompat.Action.Builder(
                         R.drawable.ic_add_box_black_24dp,
                         "Add",

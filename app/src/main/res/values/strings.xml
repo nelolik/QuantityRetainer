@@ -14,6 +14,7 @@
     <string name="enter_add_on_tap">Add count:</string>
     <string name="increment_count_label">Count to add by tap</string>
     <string name="tap_to_add">Tap to add</string>
-    <string name="inrement_channel_name">Add new round</string>
+    <string name="inсrement_channel_name">Add new round</string>
+    <string name="notification_title">Total count:</string>
 
 </resources>
