@@ -1,6 +1,7 @@
 package com.nelolik.stud.quantityretainer;
 
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -101,6 +102,7 @@ public class RecordFragment extends android.support.v4.app.Fragment {
             @Override
             public void onClick(View v) {
                 addOnTap();
+                showNotification();
             }
         });
 
@@ -193,14 +195,17 @@ public class RecordFragment extends android.support.v4.app.Fragment {
             @Override
             public void run() {
                 getAllRecords();
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mTotalCount.setText(String.valueOf(getTotalCount(mCursor)));
-                        mAdapter.setCursor(mCursor);
-                        mAdapter.notifyDataSetChanged();
-                    }
-                });
+                Activity activity = getActivity();
+                if (activity != null) {
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mTotalCount.setText(String.valueOf(getTotalCount(mCursor)));
+                            mAdapter.setCursor(mCursor);
+                            mAdapter.notifyDataSetChanged();
+                        }
+                    });
+                }
             }
         });
     }

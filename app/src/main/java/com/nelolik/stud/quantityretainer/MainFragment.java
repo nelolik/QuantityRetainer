@@ -1,6 +1,7 @@
 package com.nelolik.stud.quantityretainer;
 
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -75,7 +76,7 @@ public class MainFragment extends Fragment implements
 
         mTopicsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
+        FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setRippleColor(getResources().getColor(R.color.secondaryLightColor));
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,7 +84,9 @@ public class MainFragment extends Fragment implements
                 FragmentManager fragmentManager = getFragmentManager();
                 AddRetentionDialog dialog = new AddRetentionDialog();
                 dialog.setAddRetentionOnCLick(MainFragment.this);
-                dialog.show(fragmentManager, "retentions");
+                if (fragmentManager != null) {
+                    dialog.show(fragmentManager, "retentions");
+                }
             }
         });
 
@@ -131,6 +134,9 @@ public class MainFragment extends Fragment implements
     @Override
     public void onListItemClick(String retentionName, String tableName) {
         FragmentManager fragmentManager = getFragmentManager();
+        if (fragmentManager == null) {
+            return;
+        }
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         Bundle bundle = new Bundle();
         bundle.putString(RecordFragment.TAG_NAME, retentionName);
@@ -181,12 +187,15 @@ public class MainFragment extends Fragment implements
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mMainRecyclerAdapter.notifyDataSetChanged();
-                    }
-                });
+                Activity activity = getActivity();
+                if (activity != null) {
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mMainRecyclerAdapter.notifyDataSetChanged();
+                        }
+                    });
+                }
             }
         });
     }
@@ -245,14 +254,16 @@ public class MainFragment extends Fragment implements
                 writeNewRetentionNameToDB(newName, tableName);
             }
         });
-        dialog.show(fragmentManager, "rename");
+        if (fragmentManager!= null) {
+            dialog.show(fragmentManager, "rename");
+        }
     }
 
     void writeNewRetentionNameToDB(final String newName, final String tableName) {
         mDbThreadHandler.post(new Runnable() {
             @Override
             public void run() {
-                Cursor cursor = null;
+                Cursor cursor;
                 try {
                     cursor = mDb.query(RetainDBContract.Retentions.TABLE_NAME,
                             null,
@@ -284,6 +295,7 @@ public class MainFragment extends Fragment implements
                     } finally {
                         mDb.endTransaction();
                     }
+                    cursor.close();
                     getAllRetentionsCursor();
                 }
             }
@@ -299,7 +311,9 @@ public class MainFragment extends Fragment implements
                 deleteRetentionFromDB(tableName);
             }
         });
-        dialog.show(manager, "deleteDialog");
+        if (manager != null) {
+            dialog.show(manager, "deleteDialog");
+        }
     }
 
     void deleteRetentionFromDB(final String tableName) {
@@ -345,8 +359,10 @@ public class MainFragment extends Fragment implements
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
-                    retentionsDb.endTransaction();
-                    retentionsDb.close();
+                    if (retentionsDb != null) {
+                        retentionsDb.endTransaction();
+                        retentionsDb.close();
+                    }
                 }
             }
         });
