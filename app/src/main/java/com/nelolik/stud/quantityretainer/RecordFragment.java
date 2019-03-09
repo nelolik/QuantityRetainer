@@ -361,6 +361,4 @@ public class RecordFragment extends android.support.v4.app.Fragment {
         }
     }
 
-
-
 }

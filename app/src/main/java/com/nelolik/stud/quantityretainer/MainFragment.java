@@ -143,6 +143,9 @@ public class MainFragment extends Fragment implements
         bundle.putString(RecordFragment.TAG_TABLE, tableName);
         RecordFragment recordFragment = new RecordFragment();
         recordFragment.setArguments(bundle);
+        fragmentTransaction.setCustomAnimations(R.anim.anim_enter, R.anim.anim_exit,
+                R.anim.anim_pop_enter, R.anim.anim_pop_exit);
+
         fragmentTransaction.replace(R.id.fragment_container, recordFragment);
         fragmentTransaction.addToBackStack(BACKSTACK_TAG);
         fragmentTransaction.commit();
@@ -366,9 +369,6 @@ public class MainFragment extends Fragment implements
                 }
             }
         });
-
-
     }
-
 
 }
