@@ -17,6 +17,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -51,6 +52,7 @@ public class MainFragment extends Fragment implements
     private Handler mDbThreadHandler;
     private Cursor mCursor;
     private MainRecyclerAdapter mMainRecyclerAdapter;
+    private SwipeRefreshLayout mSwipeRefesh;
 
     @Override
     public void onDestroy() {
@@ -73,8 +75,16 @@ public class MainFragment extends Fragment implements
         mDbThreadHandler = new Handler(mWorkingThread.getLooper());
 
         mTopicsRecyclerView = view.findViewById(R.id.topics_recycler_view);
-
         mTopicsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        mSwipeRefesh = view.findViewById(R.id.swap_refresh_main);
+        mSwipeRefesh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getAllRetentionsCursor();
+            }
+        });
+        mSwipeRefesh.setRefreshing(true);
 
         FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setRippleColor(getResources().getColor(R.color.secondaryLightColor));
@@ -196,6 +206,7 @@ public class MainFragment extends Fragment implements
                         @Override
                         public void run() {
                             mMainRecyclerAdapter.notifyDataSetChanged();
+                            mSwipeRefesh.setRefreshing(false);
                         }
                     });
                 }
