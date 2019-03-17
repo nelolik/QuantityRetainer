@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.nelolik.stud.quantityretainer.Utilyties.RecordsProvider;
 import com.nelolik.stud.quantityretainer.Utilyties.RetainDBContract;
 
 public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapter.TopicViewHolder> {
@@ -18,13 +17,11 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
 
     private Cursor mCursor;
 
-    private RecordsProvider recordsProvider;
     final private ListItemClickListener mItemClickListener;
 
     public MainRecyclerAdapter(Context context, ListItemClickListener listener, Cursor cursor) {
 
         mContext = context;
-        recordsProvider = new RecordsProvider();
         mItemClickListener = listener;
         mCursor = cursor;
     }
@@ -92,7 +89,7 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
     }
 
     public interface ListItemClickListener {
-        public void onListItemClick(String retentionName, String tableName);
-        public boolean onLongListItemClick(TextView view, String tableName);
+        void onListItemClick(String retentionName, String tableName);
+        boolean onLongListItemClick(TextView view, String tableName);
     }
 }

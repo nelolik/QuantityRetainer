@@ -1,5 +1,6 @@
 package com.nelolik.stud.quantityretainer.Dialogs;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -17,7 +18,11 @@ public class DeleteConfirmationDialog extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        LayoutInflater inflater = getActivity().getLayoutInflater();
+        Activity activity = getActivity();
+        if (activity == null) {
+            return super.onCreateDialog(savedInstanceState);
+        }
+        LayoutInflater inflater = activity.getLayoutInflater();
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(inflater.inflate(R.layout.fragment_conferm_dialog, null))
                 .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
@@ -36,7 +41,7 @@ public class DeleteConfirmationDialog extends DialogFragment {
     }
 
     public interface RenameRetentionONClickListener {
-        public void onDialogClickDelete();
+        void onDialogClickDelete();
     }
 
     public void setOnDeleteClickListener(RenameRetentionONClickListener listener) {

@@ -13,8 +13,6 @@ public class RetainDBHelper extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 2;
     public static final String DATABASE_NAME = "RetainEntities.db";
 
-    private String mTableName;
-
     public RetainDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -35,7 +33,7 @@ public class RetainDBHelper extends SQLiteOpenHelper {
             while (c.moveToNext()) {
                 tables.add(c.getString(0));
             }
-
+            c.close();
     // call DROP TABLE on every table name
             for (String table : tables) {
                 if (table.startsWith("sqlite_") || table.startsWith("android_")) {

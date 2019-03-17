@@ -17,7 +17,6 @@ public class ShowAllActivity extends AppCompatActivity {
 
     private SQLiteDatabase mDb;
     private Cursor mCursor;
-    private RecyclerView mRecyclerView;
     private ShowAllRecyclerAdapter mAdapter;
     private HandlerThread mWorkingThread;
     private Handler mDbThreadHandler;
@@ -32,7 +31,7 @@ public class ShowAllActivity extends AppCompatActivity {
         mWorkingThread.start();
         mDbThreadHandler = new Handler(mWorkingThread.getLooper());
 
-        mRecyclerView = findViewById(R.id.all_rec_recycler);
+        RecyclerView mRecyclerView = findViewById(R.id.all_rec_recycler);
 
         RetainDBHelper dbHelper = new RetainDBHelper(this);
         mDb = dbHelper.getWritableDatabase();

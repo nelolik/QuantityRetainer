@@ -1,7 +1,6 @@
 package com.nelolik.stud.quantityretainer;
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -29,11 +28,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
     public void onMenuShowAllRetentions(MenuItem item) {
         Intent intent = new Intent(this, ShowAllActivity.class);
         startActivity(intent);
@@ -49,8 +43,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-    }
 }

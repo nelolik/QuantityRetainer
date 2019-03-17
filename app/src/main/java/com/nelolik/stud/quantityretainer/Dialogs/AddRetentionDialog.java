@@ -1,5 +1,6 @@
 package com.nelolik.stud.quantityretainer.Dialogs;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -14,8 +15,8 @@ import com.nelolik.stud.quantityretainer.R;
 public class AddRetentionDialog extends DialogFragment {
 
     public interface AddRetentionOnCLick {
-        public void onDialogClickAdd(DialogFragment dialogFragment);
-        public void onDialogClickCancel(DialogFragment dialogFragment);
+        void onDialogClickAdd(DialogFragment dialogFragment);
+        void onDialogClickCancel(DialogFragment dialogFragment);
     }
 
     public static final String KEY_LISTENER_ACTIVITY = "listener_activity";
@@ -31,31 +32,14 @@ public class AddRetentionDialog extends DialogFragment {
         return mNewRetentionName;
     }
 
-    /**
-     * Override to build your own custom Dialog container.  This is typically
-     * used to show an AlertDialog instead of a generic Dialog; when doing so,
-     * {@link #onCreateView(LayoutInflater, ViewGroup, Bundle)} does not need
-     * to be implemented since the AlertDialog takes care of its own content.
-     *
-     * <p>This method will be called after {@link #onCreate(Bundle)} and
-     * before {@link #onCreateView(LayoutInflater, ViewGroup, Bundle)}.  The
-     * default implementation simply instantiates and returns a {@link Dialog}
-     * class.
-     *
-     * <p><em>Note: DialogFragment own the {@link Dialog#setOnCancelListener
-     * Dialog.setOnCancelListener} and {@link Dialog#setOnDismissListener
-     * Dialog.setOnDismissListener} callbacks.  You must not set them yourself.</em>
-     * To find out about these events, override {@link #onCancel(DialogInterface)}
-     * and {@link #onDismiss(DialogInterface)}.</p>
-     *
-     * @param savedInstanceState The last saved instance state of the Fragment,
-     *                           or null if this is a freshly created Fragment.
-     * @return Return a new Dialog instance to be displayed by the Fragment.
-     */
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        LayoutInflater layoutInflater = getActivity().getLayoutInflater();
+        Activity activity = getActivity();
+        if (activity == null) {
+            return super.onCreateDialog(savedInstanceState);
+        }
+        LayoutInflater layoutInflater = activity.getLayoutInflater();
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(layoutInflater.inflate(R.layout.fragment_add_dialog, null))
                 .setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {

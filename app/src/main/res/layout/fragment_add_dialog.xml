@@ -9,6 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/add_retention_name"
+        android:labelFor="@+id/new_retention_name"
         style="@style/Dialog"/>
 
     <EditText
@@ -17,6 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:inputType="textPersonName" />
+        android:inputType="textPersonName"
+        android:importantForAutofill="no" />
 
 </LinearLayout>

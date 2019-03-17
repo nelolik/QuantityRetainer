@@ -134,7 +134,11 @@ public class MainFragment extends Fragment implements
     @Override
     public void onResume() {
         super.onResume();
-        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        if (activity == null) {
+            return;
+        }
+        ActionBar actionBar = activity.getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle(R.string.app_name);
             actionBar.setDisplayHomeAsUpEnabled(false);
@@ -273,7 +277,7 @@ public class MainFragment extends Fragment implements
         }
     }
 
-    void writeNewRetentionNameToDB(final String newName, final String tableName) {
+    private void writeNewRetentionNameToDB(final String newName, final String tableName) {
         mDbThreadHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -316,7 +320,7 @@ public class MainFragment extends Fragment implements
         });
     }
 
-    void deleteRetention(final String tableName) {
+    private void deleteRetention(final String tableName) {
         FragmentManager manager = getFragmentManager();
         DeleteConfirmationDialog dialog = new DeleteConfirmationDialog();
         dialog.setOnDeleteClickListener(new DeleteConfirmationDialog.RenameRetentionONClickListener() {
@@ -330,7 +334,7 @@ public class MainFragment extends Fragment implements
         }
     }
 
-    void deleteRetentionFromDB(final String tableName) {
+    private void deleteRetentionFromDB(final String tableName) {
         mDbThreadHandler.post(new Runnable() {
             @Override
             public void run() {

@@ -1,5 +1,6 @@
 package com.nelolik.stud.quantityretainer.Dialogs;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -17,11 +18,15 @@ public class RenameRetentionDialog extends DialogFragment {
     private String mNewRetentionName;
     private RenameRetentionONClickListener mOnClickListener;
     private String mOldName;
-    private EditText mText;
 
+    @SuppressWarnings("UnnecessaryLocalVariable")
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Activity activity = getActivity();
+        if (activity == null) {
+            return super.onCreateDialog(savedInstanceState);
+        }
         LayoutInflater layoutInflater = getActivity().getLayoutInflater();
         View view = layoutInflater.inflate(R.layout.fragment_rename_dialog, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -41,14 +46,13 @@ public class RenameRetentionDialog extends DialogFragment {
 //                        mAddRetentionOnCLick.onDialogClickCancel(AddRetentionDialog.this);
                     }
                 });
-        Dialog dialog = builder.create();
-        return dialog;
+        return builder.create();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mText = getDialog().findViewById(R.id.new_name);
+        EditText mText = getDialog().findViewById(R.id.new_name);
         mText.setText(mOldName);
         mText.selectAll();
 
@@ -59,7 +63,7 @@ public class RenameRetentionDialog extends DialogFragment {
     }
 
     public interface RenameRetentionONClickListener {
-        public void onDialogClickRename(String newName);
+        void onDialogClickRename(String newName);
     }
 
     public void setOnClickListener(RenameRetentionONClickListener listener) {

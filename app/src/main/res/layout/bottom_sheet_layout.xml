@@ -17,7 +17,7 @@
         app:layout_constraintRight_toRightOf="parent"/>
 
     <android.support.constraint.Guideline
-        android:id="@+id/horizontal_middle"
+        android:id="@+id/horizontal_middle_bsh"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -30,8 +30,8 @@
         app:layout_constraintTop_toTopOf="parent"
         android:text="@string/enter_add_on_tap"
         android:textSize="20sp"
-        app:layout_constraintEnd_toStartOf="@id/horizontal_middle"
-        app:layout_constraintRight_toLeftOf="@id/horizontal_middle"
+        app:layout_constraintEnd_toStartOf="@id/horizontal_middle_bsh"
+        app:layout_constraintRight_toLeftOf="@id/horizontal_middle_bsh"
         app:layout_constraintBaseline_toBaselineOf="@id/increment_count_input"
         android:layout_marginTop="@dimen/sheet_text_top_margin"
         android:layout_marginBottom="@dimen/margin_text_bottom_shit"
@@ -50,8 +50,8 @@
         android:hint="@string/increment_count_label"
         android:inputType="number"
         android:textSize="20sp"
-        app:layout_constraintLeft_toRightOf="@id/horizontal_middle"
-        app:layout_constraintStart_toEndOf="@id/horizontal_middle"
+        app:layout_constraintLeft_toRightOf="@id/horizontal_middle_bsh"
+        app:layout_constraintStart_toEndOf="@id/horizontal_middle_bsh"
         app:layout_constraintTop_toTopOf="parent"
         android:importantForAutofill="no" />
 

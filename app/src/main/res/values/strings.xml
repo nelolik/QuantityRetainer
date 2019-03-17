@@ -9,6 +9,7 @@
     <string name="rename">Rename</string>
     <string name="delete">Delete</string>
     <string name="enter_new_name">Enter new name</string>
+    <string name="new_name_hint">New name</string>
     <string name="confirm_delete">Delete selected element?</string>
     <string name="show_all_retentions">Show all retentions</string>
     <string name="enter_add_on_tap">Add count:</string>

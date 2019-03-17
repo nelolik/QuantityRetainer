@@ -7,7 +7,7 @@
     <string name="total_count">Общее количество:</string>
     <string name="rename">Переименовать</string>
     <string name="delete">Удалить</string>
-    <string name="enter_new_name">Введите новое имя</string>
+    <string name="enter_new_name">Введите новое название</string>
     <string name="confirm_delete">Удалить выделеный элемент?</string>
     <string name="show_all_retentions">Показать все сохранения</string>
     <string name="enter_add_on_tap">Добавка:</string>
@@ -16,4 +16,5 @@
     <string name="increment_count_label">Число, добавляемое по нажатию</string>
     <string name="inсrement_channel_name">Добавить новый круг</string>
     <string name="notification_title">Всего за сессию:</string>
+    <string name="new_name_hint">Новое название</string>
 </resources>

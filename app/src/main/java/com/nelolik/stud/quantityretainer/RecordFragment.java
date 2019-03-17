@@ -47,15 +47,14 @@ import java.util.Date;
 public class RecordFragment extends android.support.v4.app.Fragment {
     public static final String TAG_NAME = "RETENTION_NAME";
     public static final String TAG_TABLE = "TABLE_NAME";
-    public static final String PREF_INCREMENT_SIZE = "pref_increment_size";
+    private static final String PREF_INCREMENT_SIZE = "pref_increment_size";
     private static final String INCREMENT_CHANNEL = "increment";
     private static final int NOTIFICATION_ID = 1;
     private static final int REQUEST_CODE = 0;
 
     private static RecordFragment instance = null;
 
-    TextView mTotalText;
-    TextView mTotalCount;
+    private TextView mTotalCount;
     private EditText mAddCount;
     private Button mAddButton;
     private NestedScrollView mBottomSheet;
@@ -90,7 +89,6 @@ public class RecordFragment extends android.support.v4.app.Fragment {
         mWorkingThread.start();
         mDbThreadHandler = new Handler(mWorkingThread.getLooper());
 
-        mTotalText = view.findViewById(R.id.total_text);
         mTotalCount = view.findViewById(R.id.total_count);
         mAddCount = view.findViewById(R.id.add_count_input);
         mAddButton = view.findViewById(R.id.btn_add);
@@ -125,10 +123,13 @@ public class RecordFragment extends android.support.v4.app.Fragment {
             }
         });
 
-        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setTitle(mRetentionName);
-            actionBar.setDisplayHomeAsUpEnabled(true);
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        if (activity != null) {
+            ActionBar actionBar = activity.getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setTitle(mRetentionName);
+                actionBar.setDisplayHomeAsUpEnabled(true);
+            }
         }
 
         int increment_size = ((AppCompatActivity)getActivity()).getPreferences(Context.MODE_PRIVATE)
@@ -181,13 +182,15 @@ public class RecordFragment extends android.support.v4.app.Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        SharedPreferences.Editor editor = ((AppCompatActivity)getActivity())
-                .getPreferences(Context.MODE_PRIVATE).edit();
-        editor.putInt(PREF_INCREMENT_SIZE, Integer.parseInt(mAddOnTap.getText().toString()));
-        if (mCountName != null) {
-            editor.putInt(mCountName, Integer.parseInt(mAddCount.getText().toString()));
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        if (activity != null) {
+            SharedPreferences.Editor editor = activity.getPreferences(Context.MODE_PRIVATE).edit();
+            editor.putInt(PREF_INCREMENT_SIZE, Integer.parseInt(mAddOnTap.getText().toString()));
+            if (mCountName != null) {
+                editor.putInt(mCountName, Integer.parseInt(mAddCount.getText().toString()));
+            }
+            editor.apply();
         }
-        editor.apply();
     }
 
     private void getAllRecordsAndShow() {
@@ -277,7 +280,7 @@ public class RecordFragment extends android.support.v4.app.Fragment {
         super.onConfigurationChanged(newConfig);
     }
 
-    public void createMessagesNotificationChannel(Context context) {
+    private void createMessagesNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = context
                     .getString(R.string.inсrement_channel_name);
@@ -340,12 +343,12 @@ public class RecordFragment extends android.support.v4.app.Fragment {
         notificationManager.cancel(NOTIFICATION_ID);
     }
 
-    public static RecordFragment getInstance() {
+    private static RecordFragment getInstance() {
         return instance;
     }
 
     public static class NotificationActionReceiver extends BroadcastReceiver {
-        public static final String ADD_PRESSED_ACTION =
+        static final String ADD_PRESSED_ACTION =
                 "com.nelolik.stud.quantityretainer.ADD_PRESSED_ACTION";
 
         public NotificationActionReceiver() {}
