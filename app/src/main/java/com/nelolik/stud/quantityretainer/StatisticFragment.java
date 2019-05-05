@@ -60,6 +60,9 @@ public class StatisticFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_statistic, container, false);
         mGraphView = view.findViewById(R.id.statistic_graph);
+//        mGraphView.getViewport().setYAxisBoundsManual(true);
+        mGraphView.getViewport().calcCompleteRange();
+        mGraphView.getViewport().setScalable(true);
         if (mRetProvider != null) {
             mDbThreadHandler.post(() -> {
                 getDataToDisplay();
@@ -68,6 +71,7 @@ public class StatisticFragment extends Fragment {
                     activity.runOnUiThread(() -> {
                         BarGraphSeries<DataPoint> series =
                                 new BarGraphSeries<>(mPoints);
+                        series.setSpacing(50);
                         mGraphView.addSeries(series);
                     });
                 }
@@ -111,7 +115,7 @@ public class StatisticFragment extends Fragment {
                 dataMap.put(stringDay, count);
             }
         }
-        mPoints = new DataPoint[dataMap.size()];
+        mPoints = new DataPoint[dataMap.size() + 1];
         int i = 0;
         Set<Map.Entry<String,Integer>> dataSet = dataMap.entrySet();
         for (Map.Entry<String, Integer> e:
@@ -119,6 +123,7 @@ public class StatisticFragment extends Fragment {
             mPoints[i] = new DataPoint(i, e.getValue());
             ++i;
         }
+        mPoints[i] = new DataPoint(i, 0);
     }
 
 }
