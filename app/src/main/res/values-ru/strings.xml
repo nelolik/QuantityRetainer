@@ -17,4 +17,5 @@
     <string name="inсrement_channel_name">Добавить новый круг</string>
     <string name="notification_title">Всего за сессию:</string>
     <string name="new_name_hint">Новое название</string>
+    <string name="statistics">Cтатистика</string>
 </resources>

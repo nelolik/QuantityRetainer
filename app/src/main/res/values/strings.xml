@@ -8,6 +8,7 @@
     <string name="add_count_label">Count to add</string>
     <string name="rename">Rename</string>
     <string name="delete">Delete</string>
+    <string name="statistics">Statistic</string>
     <string name="enter_new_name">Enter new name</string>
     <string name="new_name_hint">New name</string>
     <string name="confirm_delete">Delete selected element?</string>
@@ -17,5 +18,6 @@
     <string name="tap_to_add">Tap to add</string>
     <string name="inсrement_channel_name">Add new round</string>
     <string name="notification_title">Total count:</string>
+
 
 </resources>

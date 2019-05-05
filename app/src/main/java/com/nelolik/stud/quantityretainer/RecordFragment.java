@@ -7,13 +7,11 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,6 +19,8 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.widget.NestedScrollView;
@@ -29,6 +29,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -36,9 +39,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.nelolik.stud.quantityretainer.Utilyties.RetainDBContract;
-import com.nelolik.stud.quantityretainer.Utilyties.RetainDBHelper;
-
-import java.util.Date;
+import com.nelolik.stud.quantityretainer.Utilyties.RetentionsProvider;
 
 
 /**
@@ -64,7 +65,7 @@ public class RecordFragment extends android.support.v4.app.Fragment {
     private RetentionRecyclerAdapter mAdapter;
     private String mRetentionName;
     private String mCountName;
-    private SQLiteDatabase mDb;
+    private RetentionsProvider mRetProvider;
     private Cursor mCursor;
     private HandlerThread mWorkingThread;
     private Handler mDbThreadHandler;
@@ -76,8 +77,6 @@ public class RecordFragment extends android.support.v4.app.Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        RetainDBHelper dbHelper = new RetainDBHelper(getContext());
-        mDb = dbHelper.getWritableDatabase();
     }
 
     @Override
@@ -114,6 +113,8 @@ public class RecordFragment extends android.support.v4.app.Fragment {
             }
         }
 
+        mRetProvider = new RetentionsProvider(getContext(), mCountName);
+
         mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -142,6 +143,7 @@ public class RecordFragment extends android.support.v4.app.Fragment {
         } else {
             mAddCount.setText("0");
         }
+        setHasOptionsMenu(true);
         instance = this;
         return view;
     }
@@ -197,7 +199,7 @@ public class RecordFragment extends android.support.v4.app.Fragment {
         mDbThreadHandler.post(new Runnable() {
             @Override
             public void run() {
-                getAllRecords();
+                mCursor = mRetProvider.getAllRecords();
                 Activity activity = getActivity();
                 if (activity != null) {
                     activity.runOnUiThread(new Runnable() {
@@ -211,22 +213,6 @@ public class RecordFragment extends android.support.v4.app.Fragment {
                 }
             }
         });
-    }
-
-    private void getAllRecords() {
-        try {
-            String selection = RetainDBContract.RetainEntity.COLUMN_NAME + "=?";
-            mCursor = mDb.query(RetainDBContract.RetainEntity.TABLE_NAME,
-                    null,
-                    selection,
-                    new String[]{mCountName},
-                    null,
-                    null,
-                    RetainDBContract.RetainEntity._ID + " DESC"
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     private int getTotalCount(Cursor cursor) {
@@ -249,20 +235,7 @@ public class RecordFragment extends android.support.v4.app.Fragment {
         mDbThreadHandler.post(new Runnable() {
             @Override
             public void run() {
-                ContentValues cv = new ContentValues();
-                cv.put(RetainDBContract.RetainEntity.COLUMN_COUNT, newCount);
-                cv.put(RetainDBContract.RetainEntity.COLUMN_NAME, mCountName);
-                cv.put(RetainDBContract.RetainEntity.COLUMN_DATE, new Date().getTime());
-                try {
-                    mDb.beginTransaction();
-                    mDb.insert(RetainDBContract.RetainEntity.TABLE_NAME, null, cv);
-                    mDb.setTransactionSuccessful();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    mDb.endTransaction();
-                }
-
+                mRetProvider.addNewCountToDB(newCount);
                 getAllRecordsAndShow();
             }
         });
@@ -364,4 +337,33 @@ public class RecordFragment extends android.support.v4.app.Fragment {
         }
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_record_fragment, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_statistic) {
+            FragmentManager fragmentManager = getFragmentManager();
+            if (fragmentManager != null) {
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                Bundle bundle = new Bundle();
+                bundle.putString(RecordFragment.TAG_NAME, mRetentionName);
+                bundle.putString(RecordFragment.TAG_TABLE, mCountName);
+                StatisticFragment statisticFragment = new StatisticFragment();
+                statisticFragment.setArguments(bundle);
+                fragmentTransaction.setCustomAnimations(R.anim.anim_enter, R.anim.anim_exit,
+                        R.anim.anim_pop_enter, R.anim.anim_pop_exit);
+
+                fragmentTransaction.replace(R.id.fragment_container, statisticFragment);
+                fragmentTransaction.addToBackStack(MainFragment.BACKSTACK_TAG);
+                fragmentTransaction.commit();
+                return true;
+            }
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 }
