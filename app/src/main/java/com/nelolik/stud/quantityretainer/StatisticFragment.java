@@ -3,6 +3,7 @@ package com.nelolik.stud.quantityretainer;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -11,16 +12,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.series.BarGraphSeries;
-import com.jjoe64.graphview.series.DataPoint;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.nelolik.stud.quantityretainer.Utilyties.RetainDBContract;
 import com.nelolik.stud.quantityretainer.Utilyties.RetentionsProvider;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 public class StatisticFragment extends Fragment {
@@ -31,9 +35,9 @@ public class StatisticFragment extends Fragment {
     private RetentionsProvider mRetProvider;
     private HandlerThread mWorkingThread;
     private Handler mDbThreadHandler;
-    private GraphView mGraphView;
-    private DataPoint[] mPoints;
-
+    private BarChart mChart;
+    private ArrayList<BarEntry> mPointsList;
+    private ArrayList<String> mLabels = new ArrayList<>();
 
 
     public StatisticFragment() {
@@ -48,6 +52,7 @@ public class StatisticFragment extends Fragment {
             mRetentionKey = getArguments().getString(RecordFragment.TAG_TABLE);
             mRetProvider = new RetentionsProvider(getContext(), mRetentionKey);
         }
+
         mWorkingThread = new HandlerThread("RetentionThread");
         mWorkingThread.start();
         mDbThreadHandler = new Handler(mWorkingThread.getLooper());
@@ -59,20 +64,49 @@ public class StatisticFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_statistic, container, false);
-        mGraphView = view.findViewById(R.id.statistic_graph);
-//        mGraphView.getViewport().setYAxisBoundsManual(true);
-        mGraphView.getViewport().calcCompleteRange();
-        mGraphView.getViewport().setScalable(true);
+        mChart = view.findViewById(R.id.chart);
+        mChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        mChart.getXAxis().setLabelCount(7);
+        mChart.getXAxis().setLabelRotationAngle(90);
+        mChart.getXAxis().setValueFormatter(new ValueFormatter() {
+            SimpleDateFormat day = new SimpleDateFormat("dd");
+            SimpleDateFormat month = new SimpleDateFormat("MMMM");
+
+            @Override
+            public String getFormattedValue(float value) {
+                long timestamp = (long)(value * 1000 * 86400);
+                return day.format(timestamp) + "\n" + month.format(timestamp);
+            }
+        });
+        mChart.getAxisLeft().setAxisMinimum(0);
+        mChart.getAxisLeft().setDrawLabels(false);
+        mChart.getAxisLeft().setDrawGridLines(false);
+        mChart.getAxisLeft().setDrawZeroLine(true);
+        mChart.getAxisRight().setAxisMinimum(0);
+        mChart.getAxisRight().setDrawLabels(false);
+        mChart.getAxisRight().setDrawGridLines(false);
+
+
         if (mRetProvider != null) {
             mDbThreadHandler.post(() -> {
                 getDataToDisplay();
+                BarDataSet dataSet = new BarDataSet(mPointsList, "Label");
+                dataSet.setColor(Color.BLUE);
+//                dataSet.setFormSize(30);
+                dataSet.setValueTextSize(15);
+                dataSet.setBarBorderColor(Color.BLUE);
+                dataSet.setBarBorderWidth(3);
+                BarData data = new BarData(dataSet);
+                data.setBarWidth(3);
+
                 Activity activity = getActivity();
-                if (activity != null && mPoints != null && mPoints.length > 0) {
+                if (activity != null && dataSet != null) {
                     activity.runOnUiThread(() -> {
-                        BarGraphSeries<DataPoint> series =
-                                new BarGraphSeries<>(mPoints);
-                        series.setSpacing(50);
-                        mGraphView.addSeries(series);
+                        mChart.setData(data);
+                        float lastIndex = mPointsList.get(0).getX();
+                        mChart.moveViewToX(mChart.getXChartMax() - 7);
+                        mChart.invalidate();
+
                     });
                 }
             });
@@ -90,40 +124,52 @@ public class StatisticFragment extends Fragment {
         super.onDetach();
     }
 
-    private void getDataToDisplay() {
-        Cursor cursor = mRetProvider.getAllRecords();
+    private ArrayList<BarEntry> getDataToDisplay() {
+        Cursor cursor = mRetProvider.getAllRecordsASC();
         if (cursor == null || !cursor.moveToFirst()) {
-            return;
+            return new ArrayList<BarEntry>();
         }
-        HashMap<String, Integer> dataMap = new HashMap<String, Integer>(cursor.getCount());
+        HashMap<Long, Integer> dataMap = new HashMap<Long, Integer>();
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM");
         int columnCountIndex = cursor.getColumnIndex(RetainDBContract.RetainEntity.COLUMN_COUNT);
         int columnDateIndex = cursor.getColumnIndex(RetainDBContract.RetainEntity.COLUMN_DATE);
-        int count = cursor.getInt(columnCountIndex);
-        long timestamp = cursor.getLong(columnDateIndex);
-        Date date = new Date(timestamp);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMM yyyy");
-        String stringDay = simpleDateFormat.format(date);
-        dataMap.put(stringDay, count);
+        int count;// = cursor.getInt(columnCountIndex);
+        long timestamp;// = cursor.getLong(columnDateIndex);
+        cursor.moveToPosition(-1);
         while (cursor.moveToNext()) {
             count = cursor.getInt(columnCountIndex);
             timestamp = cursor.getLong(columnDateIndex);
-            date.setTime(timestamp);
-            stringDay = simpleDateFormat.format(date);
-            if (dataMap.containsKey(stringDay)) {
-                dataMap.put(stringDay, count + dataMap.get(stringDay));
+            if (timestamp < 100000) {continue;}
+            long day = timestamp / 1000 / 86400;
+            if (dataMap.containsKey(day)) {
+                dataMap.put(day, count + dataMap.get(day));
             } else {
-                dataMap.put(stringDay, count);
+                dataMap.put(day, count);
             }
         }
-        mPoints = new DataPoint[dataMap.size() + 1];
-        int i = 0;
-        Set<Map.Entry<String,Integer>> dataSet = dataMap.entrySet();
-        for (Map.Entry<String, Integer> e:
-             dataSet) {
-            mPoints[i] = new DataPoint(i, e.getValue());
-            ++i;
+
+        mPointsList = mapToSortedList(dataMap);
+        return mPointsList;
+    }
+
+    ArrayList<BarEntry> mapToSortedList(HashMap<Long, Integer> data) {
+        Set<Long> keys = data.keySet();
+        ArrayList<Long> sortedKeys = new ArrayList<Long>();
+        for (long key : keys) {
+            int position = 0;
+            for (long k : sortedKeys) {
+                if (k > key) break;
+                position++;
+            }
+            sortedKeys.add(position, key);
         }
-        mPoints[i] = new DataPoint(i, 0);
+        ArrayList<BarEntry> sortedData = new ArrayList<BarEntry>();
+        int i = 0;
+        for (Long k : keys) {
+            sortedData.add(new BarEntry(k, data.get(k)));
+        }
+        return sortedData;
     }
 
 }

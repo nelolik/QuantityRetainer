@@ -34,6 +34,22 @@ public class RetentionsProvider {
             return null;
         }
     }
+    public Cursor getAllRecordsASC() {
+        try {
+            String selection = RetainDBContract.RetainEntity.COLUMN_NAME + "=?";
+            return mDb.query(RetainDBContract.RetainEntity.TABLE_NAME,
+                    null,
+                    selection,
+                    new String[]{mRetentionKey},
+                    null,
+                    null,
+                    RetainDBContract.RetainEntity._ID + " ASC"
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     public void addNewCountToDB(int count) {
         ContentValues cv = new ContentValues();

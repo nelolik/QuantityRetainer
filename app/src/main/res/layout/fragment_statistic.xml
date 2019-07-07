@@ -4,8 +4,8 @@
     android:layout_height="match_parent"
     tools:context="com.nelolik.stud.quantityretainer.StatisticFragment">
 
-    <com.jjoe64.graphview.GraphView
-        android:id="@+id/statistic_graph"
+    <com.github.mikephil.charting.charts.BarChart
+        android:id="@+id/chart"
         android:layout_width="match_parent"
         android:layout_height="400dp" />
 
