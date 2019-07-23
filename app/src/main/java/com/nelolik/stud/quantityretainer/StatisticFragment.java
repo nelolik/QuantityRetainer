@@ -69,13 +69,12 @@ public class StatisticFragment extends Fragment {
         mChart.getXAxis().setLabelCount(7);
         mChart.getXAxis().setLabelRotationAngle(90);
         mChart.getXAxis().setValueFormatter(new ValueFormatter() {
-            SimpleDateFormat day = new SimpleDateFormat("dd");
-            SimpleDateFormat month = new SimpleDateFormat("MMMM");
+            SimpleDateFormat formater = new SimpleDateFormat("dd MMMM");
 
             @Override
             public String getFormattedValue(float value) {
-                long timestamp = (long)(value * 1000 * 86400);
-                return day.format(timestamp) + "\n" + month.format(timestamp);
+                long timestamp = (long)(value * 1000 * 86400) + 43200000;   //43200000 - middle of a day
+                return formater.format(timestamp);
             }
         });
         mChart.getAxisLeft().setAxisMinimum(0);
@@ -85,26 +84,39 @@ public class StatisticFragment extends Fragment {
         mChart.getAxisRight().setAxisMinimum(0);
         mChart.getAxisRight().setDrawLabels(false);
         mChart.getAxisRight().setDrawGridLines(false);
-
+        mChart.getLegend().setEnabled(false);
+        mChart.getDescription().setEnabled(false);
+        
+//        mChart.setVisibleXRangeMinimum(7);
+//        mChart.setVisibleXRangeMaximum(7);
 
         if (mRetProvider != null) {
             mDbThreadHandler.post(() -> {
                 getDataToDisplay();
-                BarDataSet dataSet = new BarDataSet(mPointsList, "Label");
+                BarDataSet dataSet = new BarDataSet(mPointsList, "Retention");
                 dataSet.setColor(Color.BLUE);
 //                dataSet.setFormSize(30);
                 dataSet.setValueTextSize(15);
                 dataSet.setBarBorderColor(Color.BLUE);
                 dataSet.setBarBorderWidth(3);
                 BarData data = new BarData(dataSet);
-                data.setBarWidth(3);
+                data.setBarWidth(0.8f);
+                data.setValueFormatter(new ValueFormatter() {
+                    @Override
+                    public String getFormattedValue(float value) {
+                        if (value > 0) {
+                            return String.valueOf(value);
+                        }
+                        return "";
+                    }
+                });
 
                 Activity activity = getActivity();
                 if (activity != null && dataSet != null) {
                     activity.runOnUiThread(() -> {
                         mChart.setData(data);
                         float lastIndex = mPointsList.get(0).getX();
-                        mChart.moveViewToX(mChart.getXChartMax() - 7);
+//                        mChart.moveViewToX(mChart.getXChartMax() - 7);
                         mChart.invalidate();
 
                     });
@@ -141,7 +153,7 @@ public class StatisticFragment extends Fragment {
             count = cursor.getInt(columnCountIndex);
             timestamp = cursor.getLong(columnDateIndex);
             if (timestamp < 100000) {continue;}
-            long day = timestamp / 1000 / 86400;
+            long day = timestamp / 1000 / 86400;    //86400 - seconds in day
             if (dataMap.containsKey(day)) {
                 dataMap.put(day, count + dataMap.get(day));
             } else {
@@ -150,6 +162,7 @@ public class StatisticFragment extends Fragment {
         }
 
         mPointsList = mapToSortedList(dataMap);
+        addDataIfListShort();
         return mPointsList;
     }
 
@@ -170,6 +183,18 @@ public class StatisticFragment extends Fragment {
             sortedData.add(new BarEntry(k, data.get(k)));
         }
         return sortedData;
+    }
+
+    private void addDataIfListShort() {
+        if (mPointsList.size() > 0 && mPointsList.size() < 17) {
+            BarEntry be = mPointsList.get(mPointsList.size() - 1);
+            long day = (long)be.getX();
+//            mPointsList.add(new BarEntry(day + 1, 0));
+            while (mPointsList.size() < 7) {
+                day -= 1;
+                mPointsList.add(new BarEntry(day, 0));
+            }
+        }
     }
 
 }
