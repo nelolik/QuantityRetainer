@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -182,11 +181,9 @@ public class StatisticFragment extends Fragment {
         }
         ArrayList<BarEntry> sortedData = new ArrayList<>();
         int i = 0;
-        Log.d("QUANT", "Sorted keys: " + sortedKeys);
         for (Long k : sortedKeys) {
             sortedData.add(new BarEntry(k, data.get(k)));
         }
-        Log.d("QUANT", "Sorted array: " + sortedData);
         return sortedData;
     }
 
