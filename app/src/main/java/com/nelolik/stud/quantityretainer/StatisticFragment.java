@@ -66,7 +66,8 @@ public class StatisticFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_statistic, container, false);
         mChart = view.findViewById(R.id.chart);
         mChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-        mChart.getXAxis().setLabelCount(7);
+        mChart.getXAxis().setDrawGridLines(false);
+        mChart.getXAxis().setTextSize(16.0f);
         mChart.getXAxis().setLabelRotationAngle(90);
         mChart.getXAxis().setValueFormatter(new ValueFormatter() {
             SimpleDateFormat formater = new SimpleDateFormat("dd MMMM");
@@ -86,9 +87,9 @@ public class StatisticFragment extends Fragment {
         mChart.getAxisRight().setDrawGridLines(false);
         mChart.getLegend().setEnabled(false);
         mChart.getDescription().setEnabled(false);
-        
-//        mChart.setVisibleXRangeMinimum(7);
-//        mChart.setVisibleXRangeMaximum(7);
+        mChart.setDragXEnabled(true);
+        mChart.setScaleEnabled(false);
+        mChart.setVisibleXRangeMaximum(7);
 
         if (mRetProvider != null) {
             mDbThreadHandler.post(() -> {
@@ -96,7 +97,7 @@ public class StatisticFragment extends Fragment {
                 BarDataSet dataSet = new BarDataSet(mPointsList, "Retention");
                 dataSet.setColor(Color.BLUE);
 //                dataSet.setFormSize(30);
-                dataSet.setValueTextSize(15);
+                dataSet.setValueTextSize(16);
                 dataSet.setBarBorderColor(Color.BLUE);
                 dataSet.setBarBorderWidth(3);
                 BarData data = new BarData(dataSet);
@@ -105,7 +106,7 @@ public class StatisticFragment extends Fragment {
                     @Override
                     public String getFormattedValue(float value) {
                         if (value > 0) {
-                            return String.valueOf(value);
+                            return String.valueOf((int)value);
                         }
                         return "";
                     }
@@ -116,7 +117,8 @@ public class StatisticFragment extends Fragment {
                     activity.runOnUiThread(() -> {
                         mChart.setData(data);
                         float lastIndex = mPointsList.get(0).getX();
-//                        mChart.moveViewToX(mChart.getXChartMax() - 7);
+                        mChart.moveViewToX(mChart.getXChartMax() - 7);
+                        mChart.setVisibleXRangeMaximum(7);
                         mChart.invalidate();
 
                     });
@@ -189,8 +191,7 @@ public class StatisticFragment extends Fragment {
         if (mPointsList.size() > 0 && mPointsList.size() < 17) {
             BarEntry be = mPointsList.get(mPointsList.size() - 1);
             long day = (long)be.getX();
-//            mPointsList.add(new BarEntry(day + 1, 0));
-            while (mPointsList.size() < 7) {
+            while (mPointsList.size() < 17) {
                 day -= 1;
                 mPointsList.add(new BarEntry(day, 0));
             }
