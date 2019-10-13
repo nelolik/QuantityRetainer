@@ -18,4 +18,6 @@
     <string name="notification_title">Всего за сессию:</string>
     <string name="new_name_hint">Новое название</string>
     <string name="statistics">Cтатистика</string>
+    <string name="statistic_days">По дням</string>
+    <string name="statistic_months">По месяцам</string>
 </resources>

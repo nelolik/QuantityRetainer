@@ -11,4 +11,5 @@
     <dimen name="sheet_corners_radius">16dp</dimen>
     <dimen name="sheet_tap_field_height">200dp</dimen>
     <dimen name="sheet_tap_field_height_large">400dp</dimen>
+    <dimen name="statistic_radio_group_margin">24dp</dimen>
 </resources>

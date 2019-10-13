@@ -1,8 +1,9 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.nelolik.stud.quantityretainer.StatisticFragment">
+    tools:context="com.nelolik.stud.quantityretainer.StatisticFragment"
+    android:orientation="vertical">
 
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/chart"
@@ -10,4 +11,27 @@
         android:layout_height="400dp"
         />
 
-</FrameLayout>
+
+
+    <RadioGroup
+        android:id="@+id/statistic_interval"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/statistic_radio_group_margin">
+
+        <RadioButton
+            android:id="@+id/statistic_days"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/statistic_days"/>
+
+        <RadioButton
+            android:id="@+id/statistic_months"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/statistic_months"/>
+
+    </RadioGroup>
+
+</LinearLayout>
