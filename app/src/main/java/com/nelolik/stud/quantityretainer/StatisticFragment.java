@@ -191,7 +191,6 @@ public class StatisticFragment extends Fragment {
         while (cursor.moveToNext()) {
             count = cursor.getInt(columnCountIndex);
             timestamp = cursor.getLong(columnDateIndex);
-            if (timestamp < 100000) {continue;} //HZ why
             long key;
             if (intervalDay) {
                 key = timestamp / 1000 / 86400;    //86400 - seconds in day
